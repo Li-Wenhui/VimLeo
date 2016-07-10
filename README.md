@@ -73,29 +73,17 @@ lwh@vip.163.com
 
 开始前，我假设你：0）具备基本的 vim 操作能力，清楚如何打开/编辑/保存文档、命令与插入模式间切换；1）希望将 vim 打造成 C/C++ 语言的 IDE，而非其他语言。
 
-关于 vim 的优点，你在网上能查到 128+ 项，对我而言，只有两项：0）所思即所得，让手输入的速度跟上大脑思考的速度，1）所需即所获，只有你想不到的功能、没有实现不了的插件。希望获得前者的能力，你需要两本教程深入学习，《Practical Vim: Edit Text at the Speed of Thought》和《vim user manual》；要想拥有后者的能力，通读本文 -。-#。对于 vim 的喜爱，献上湿哥哥以表景仰之情：
-<div align="center">
-vi 之大道如我心之禅，<br />
-  vi 之漫路即为禅修，<br /> 
-  vi 之命令禅印于心，<br />
- 未得此道者视之怪诞，<br />
- 与之为伴者洞其真谛，<br />
- 长修此道者巨变人生。<br />
-</div>
-<div align="right">
-作：reddy@lion.austin.com<br />
-译：yangyangwithgnu@yeah.net<br />
-</div><br />  
+关于 vim 的优点，你在网上能查到 128+ 项，对我而言，只有两项：0）所思即所得，让手输入的速度跟上大脑思考的速度，1）所需即所获，只有你想不到的功能、没有实现不了的插件。希望获得前者的能力，你需要两本教程深入学习，《Practical Vim: Edit Text at the Speed of Thought》和《vim user manual》；要想拥有后者的能力，通读本文 -。-#。
 
-言归正传，说说 vim 用于代码编写提供了哪些直接和间接功能支撑。vim 用户手册中，50％ 的例子都是在讲 vim 如何高效编写代码，由此可见，vim 是一款面向于程序员的编辑器，即使某些功能 vim 无法直接完成，借助其丰富的插件资源，必定可以达成目标，这就是所需即所获。
+vim 用户手册中，50％ 的例子都是在讲 vim 如何高效编写代码，由此可见，vim 是一款面向于程序员的编辑器，即使某些功能 vim 无法直接完成，借助其丰富的插件资源，必定可以达成目标，这就是所需即所获。
 
 我是个目标驱动的信奉者，本文内容，我会先给出优秀 C/C++ IDE 应具备哪些功能，再去探索如何通过 vim 的操作或插件来达到目标。最终至少要像这个样子：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/blob/master/images/%E5%9B%BE%E5%BD%A2%E7%8E%AF%E5%A2%83%E4%B8%8B%20IDE%20%E6%80%BB%E6%8F%BD.png" alt=""/><br />
+<img src="./images/%E5%9B%BE%E5%BD%A2%E7%8E%AF%E5%A2%83%E4%B8%8B%20IDE%20%E6%80%BB%E6%8F%BD.png" alt=""/><br />
 （图形环境下 IDE 总揽）
 </div>
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/blob/master/images/%E7%BA%AF%E5%AD%97%E7%AC%A6%E6%A8%A1%E5%BC%8F%E4%B8%8B%E6%80%BB%E8%A7%88.png" alt=""/><br />
+<img src="./images/%E7%BA%AF%E5%AD%97%E7%AC%A6%E6%A8%A1%E5%BC%8F%E4%B8%8B%E6%80%BB%E8%A7%88.png" alt=""/><br />
 （纯字符模式下 IDE 总揽）
 </div>
 
