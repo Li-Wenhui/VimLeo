@@ -536,6 +536,9 @@ Bundle 'std_c.zip'
 " 快速切换括号/引号或者标签
 Bundle 'tpope/vim-surround'
 
+" 书签可视化  
+Bundle 'kshenoy/vim-signature'
+
 " 语法与编码风格检查
 Bundle 'scrooloose/syntastic'
 
@@ -701,7 +704,7 @@ if g:isGUI
   set showtabline=2                                 "始终显示标签页, =0 隐藏Tab栏
   set guitablabel=%{tabpagenr()}.%t\ %m             "在每个tab上显示编号
   "  set guifont=Microsoft_YaHei_Mono:h12           "设置字体:字号（字体名称空格用下划线代替）
-  "  set guifont=DejaVuSansMonoforPowerline_NF:h12
+
   augroup ex_gui_font
     " check and determine the gui font after GUIEnter.
     " NOTE: getfontname function only works after GUIEnter.
@@ -749,7 +752,8 @@ endif
 " }}}
 
 
-" 显示/隐藏菜单栏、工具栏、滚动条，可用 F12 切换
+" 显示/隐藏菜单栏、工具栏、滚动条，可用 F12 切换 
+" {{{
 if g:isGUI
   set guioptions-=m  " remove menu bar
   set guioptions-=T  " remove toolbar
@@ -1795,6 +1799,35 @@ let c_cpp_comments = 0
 
 
 " -----------------------------------------------------------------------------
+"  < vim-signature 插件配置 >
+" -----------------------------------------------------------------------------
+" {{{
+let g:SignatureMap = {
+        \ 'Leader'             :  "m",
+        \ 'PlaceNextMark'      :  "m,",
+        \ 'ToggleMarkAtLine'   :  "m.",
+        \ 'PurgeMarksAtLine'   :  "m-",
+        \ 'DeleteMark'         :  "dm",
+        \ 'PurgeMarks'         :  "mda",
+        \ 'PurgeMarkers'       :  "m<BS>",
+        \ 'GotoNextLineAlpha'  :  "']",
+        \ 'GotoPrevLineAlpha'  :  "'[",
+        \ 'GotoNextSpotAlpha'  :  "`]",
+        \ 'GotoPrevSpotAlpha'  :  "`[",
+        \ 'GotoNextLineByPos'  :  "]'",
+        \ 'GotoPrevLineByPos'  :  "['",
+        \ 'GotoNextSpotByPos'  :  "mn",
+        \ 'GotoPrevSpotByPos'  :  "mp",
+        \ 'GotoNextMarker'     :  "[+",
+        \ 'GotoPrevMarker'     :  "[-",
+        \ 'GotoNextMarkerAny'  :  "]=",
+        \ 'GotoPrevMarkerAny'  :  "[=",
+        \ 'ListLocalMarks'     :  "ms",
+        \ 'ListLocalMarkers'   :  "m?"
+        \ }
+" }}}
+
+" -----------------------------------------------------------------------------
 "  < Syntastic 插件配置 >
 " -----------------------------------------------------------------------------
 " {{{
@@ -1858,6 +1891,42 @@ let g:tagbar_width=30                       "设置窗口宽度
 let g:tagbar_sort = 0                       " 关闭排序     [也就是按标签本身在文件中的位置排序]
 let g:tagbar_show_linenumbers = -1          " 显示行号     [使用全局关于行号的默认配置]
 let g:tagbar_autopreview = 1                " 开启自动预览 [随着光标在标签上的移动，顶部会出现一个实时的预览窗口]
+let g:tagbar_compact=1                      " tagbar 子窗口中不显示冗余帮助信息
+ 
+" 设置 ctags 对哪些代码标识符生成标签
+let g:tagbar_type_cpp = {
+    \ 'kinds' : [
+         \ 'c:classes:0:1',
+         \ 'd:macros:0:1',
+         \ 'e:enumerators:0:0', 
+         \ 'f:functions:0:1',
+         \ 'g:enumeration:0:1',
+         \ 'l:local:0:1',
+         \ 'm:members:0:1',
+         \ 'n:namespaces:0:1',
+         \ 'p:functions_prototypes:0:1',
+         \ 's:structs:0:1',
+         \ 't:typedefs:0:1',
+         \ 'u:unions:0:1',
+         \ 'v:global:0:1',
+         \ 'x:external:0:1'
+     \ ],
+     \ 'sro'        : '::',
+     \ 'kind2scope' : {
+         \ 'g' : 'enum',
+         \ 'n' : 'namespace',
+         \ 'c' : 'class',
+         \ 's' : 'struct',
+         \ 'u' : 'union'
+     \ },
+     \ 'scope2kind' : {
+         \ 'enum'      : 'g',
+         \ 'namespace' : 'n',
+         \ 'class'     : 'c',
+         \ 'struct'    : 's',
+         \ 'union'     : 'u'
+     \ }
+\ }
 " }}}
 
 
