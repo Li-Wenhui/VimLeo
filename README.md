@@ -79,11 +79,11 @@ vim 用户手册中，50％ 的例子都是在讲 vim 如何高效编写代码�
 
 我是个目标驱动的信奉者，本文内容，我会先给出优秀 C/C++ IDE 应具备哪些功能，再去探索如何通过 vim 的操作或插件来达到目标。最终至少要像这个样子：
 <div align="center">
-<img src="./images/图形环境下 IDE 总揽.png" alt=""/><br />
+<img src="https://git.oschina.net/liwenhui/LeoVim/blob/master/images/图形环境下 IDE 总揽.png" alt=""/><br />
 （图形环境下 IDE 总揽）
 </div>
 <div align="center">
-<img src="./images/纯字符模式下总览.png" alt=""/><br />
+<img src="https://git.oschina.net/liwenhui/LeoVim/blob/master/images/纯字符模式下总览.png" alt=""/><br />
 （纯字符模式下 IDE 总揽）
 </div>
 
