@@ -74,6 +74,10 @@
 " \tb                        --打开/关闭TagBar窗口
 " \tc                        --执行ctags生成tags
 "
+" \tn                        --遍历同名标签
+" \tp                        --反向遍历同名标签
+" \sp                        --在工程内全局查找光标所在关键字
+"
 " \be                        --打开BufExplorer窗口    [独立显示] [Normal模式可用]
 " \bs                        --打开BufExplorer窗口    [分割显示] [Normal模式可用]
 " \bv                        --打开BufExplorer窗口    [边栏显示] [Normal模式可用]
@@ -95,6 +99,7 @@
 " \cm                        --添加块注释             [NERD_commenter]
 " \cu                        --取消注释               [NERD_commenter]
 "
+" \ud                        --调用 gundo 树
 
 " ---------- 补全命令 ----------
 "
@@ -608,7 +613,7 @@ Bundle 'derekwyatt/vim-protodef'
 Bundle 'TxtBrowser'
 
 " 编辑修改撤销管理
-Bundle 'mbbill/undotree'
+Bundle 'sjl/gundo.vim'
 
 " 更改开始界面
 Bundle 'mhinz/vim-startify'
@@ -1999,6 +2004,36 @@ noremap <Leader>k <Plug>(easymotion-k)
 nnoremap <ESC><ESC> :<C-u>nohlsearch<CR>
 " }}}
 
+ 
+" -----------------------------------------------------------------------------
+" indexer
+" -----------------------------------------------------------------------------
+" {{{
+" 设置插件 indexer 调用 ctags 的参数
+" 默认 --c++-kinds=+p+l，重新设置为 --c++-kinds=+l+p+x+c+d+e+f+g+m+n+s+t+u+v
+" 默认 --fields=+iaS 不满足 YCM 要求，需改为 --fields=+iaSl
+let g:indexer_ctagsCommandLineOptions="--c++-kinds=+l+p+x+c+d+e+f+g+m+n+s+t+u+v --fields=+iaSl --extra=+q"
+" 正向遍历同名标签
+nmap <Leader>tn :tnext<CR>
+" 反向遍历同名标签
+nmap <Leader>tp :tprevious<CR>
+" }}}
+
+" -----------------------------------------------------------------------------
+" ctrlsf.vim
+" -----------------------------------------------------------------------------
+" {{{
+" 使用 ctrlsf.vim 插件在工程内全局查找光标所在关键字，设置快捷键。快捷键速记法：search in project
+nnoremap <Leader>sp :CtrlSF<CR>
+" }}}
+
+" -----------------------------------------------------------------------------
+" gundo.vim
+" -----------------------------------------------------------------------------
+" {{{
+" 调用 gundo 树
+nnoremap <Leader>ud :GundoToggle<CR>
+" }}}
 
 " =============================================================================
 "                          << 以下为常用工具配置 >>

@@ -8,6 +8,7 @@
 @echo off
 set filePath=%~dp0
 set fontsdir=%SystemRoot%\Fonts\
+if not exist "%filePath%undodir" mkdir undodir
 
 :start
 cls
