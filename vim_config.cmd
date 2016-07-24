@@ -1,10 +1,3 @@
-@rem ==================================================================
-@rem
-@rem Latest compiled vim: https://tuxproject.de/projects/vim/
-@rem
-@rem ==================================================================
-
-
 @echo off
 set filePath=%~dp0
 set fontsdir=%SystemRoot%\Fonts\
