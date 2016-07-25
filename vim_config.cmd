@@ -22,7 +22,7 @@ echo　　　　║    4 : 删除右键快捷菜单                              ║
 echo　　　　║    5 : 字库安装                                      ║
 echo　　　　║    0 : 退出　                                        ║
 echo　　　　╟═══════════════════════════╢
-echo　　　　║　         WIN8/WIN10下需要以管理员身份运行此批处理!  ║
+echo　　　　║　     WIN8/WIN10下可能需要以管理员身份运行此批处理!  ║
 echo　　　　╰───────────────────────────╯
 echo.
 
@@ -40,7 +40,6 @@ echo 输入不正确 请重新开始... & goto start
 if not exist "%filePath%vim74\complete-x86.7z" echo. &echo 没有找到vim74_x86.zip! 请按任意键回到主菜单... &pause>nul &goto start
 cd "%filePath%vim74"
 7z x -y complete-x86.7z
-@rem 7z x -y lua-x86.7z
 echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
@@ -48,7 +47,6 @@ goto start
 if not exist "%filePath%vim74\complete-x64.7z" echo. &echo 没有找到vim74_x64.zip! 请按任意键回到主菜单... &pause>nul &goto start
 cd "%filePath%vim74"
 7z x -y complete-x64.7z
-@rem 7z x -y lua-x64.7z
 echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
