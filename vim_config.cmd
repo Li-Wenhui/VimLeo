@@ -70,12 +70,4 @@ goto start
 :end
 echo.
 echo.
-echo                看日出
-echo.
-echo               ╭⌒╮¤　　　　　　 ╭══╮   牵着手
-echo               ╭╭ ⌒╮ ●╭○╮ ╭╯Leo ║
-echo               ╰ ----╯/█∨█\  ╰⊙═⊙╯       去海边
-echo               ~~~~~~~~~~∏~~∏~~~~~~~~~~~.
-echo.
-echo.
 echo 任务完成，请按任意键退出... &pause>nul &exit
