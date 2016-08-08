@@ -68,6 +68,4 @@ echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
 :end
-echo.
-echo.
-echo 任务完成，请按任意键退出... &pause>nul &exit
+exit
