@@ -68,4 +68,14 @@ echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
 :end
+echo.
+echo                      看日出
+echo.
+echo                     ╭⌒╮¤　　　　　　 ╭══╮   牵着手
+echo                     ╭╭ ⌒╮ ●╭○╮ ╭╯Leo ║
+echo                     ╰ ----╯/█∨█\  ╰⊙═⊙╯       去海边
+echo                     ~~~~~~~~~~∏~~∏~~~~~~~~~~~.
+echo.
+echo 正在退出，请稍候(Waiting to exit) ...
+ping -n 10 127.1>nul
 exit

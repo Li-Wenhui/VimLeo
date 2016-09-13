@@ -34,14 +34,6 @@
 
 " ---------- Alt系按键 ----------
 "
-" Alt  + H                   --光标左移一格           [插入模式] [Linux下可能失效]
-" Alt  + J                   --光标下移一格           [插入模式] [Linux下可能失效]
-" Alt  + K                   --光标上移一格           [插入模式] [Linux下可能失效]
-" Alt  + L                   --光标右移一格           [插入模式] [Linux下可能失效]
-
-
-" ---------- Multi Cursor ---------
-
 " Alt + n                    --multi_cursor_next_key
 " Alt + p                    --multi_cursor_prev_key
 " Alt + x                    --multi_cursor_skip_key
@@ -399,18 +391,6 @@ noremap <C-k> <C-w><C-k>
 " Ctrl + L            光标移当前行行尾[插入模式]、切换右窗口[Normal模式]
 inoremap <C-l> <ESC>A
 noremap <C-l> <C-w><C-l>
-
-" Alt  + H            光标左移一格
-inoremap <m-h> <left>
-
-" Alt  + J            光标下移一格
-inoremap <m-j> <down>
-
-" Alt  + K            光标上移一格
-inoremap <m-k> <up>
-
-" Alt  + L            光标右移一格
-inoremap <m-l> <right>
 
 " \c                  复制至公共剪贴板
 vnoremap <Leader>c "+y
@@ -2169,9 +2149,9 @@ set tags+=tags;                            " 向上级目录递归查找tags文�
 " \gi 开启或关闭GitGutter
 nnoremap <Leader>gi :GitGutterToggle<CR>:GitGutterSignsToggle<CR>:GitGutterLineHighlightsToggle<CR>
 " \gd 打开Git文件对比模式 [竖直]
-nnoremap <Leader>gd :Gdiff<CR>
+nnoremap <Leader>gid :Gdiff<CR>
 " \gs 打开Git文件对比模式 [水平]
-nnoremap <Leader>gs :Gsdiff<CR>
+nnoremap <Leader>gis :Gsdiff<CR>
 
 let g:gitgutter_enabled               = 0      " 默认不开启
 let g:gitgutter_signs                 = 0      " 默认不开启提示
@@ -2188,14 +2168,14 @@ let g:gitgutter_sign_modified_removed = '->'   " 自定义既修改又删除指�
 " -----------------------------------------------------------------------------
 " {{{
 let g:startify_custom_header = [
-      \ '                                  ________  __ __       ',
-      \ '             __                  /\_______\/\ \\ \      ',
-      \ '     __  __ /\_\    ___ ___      \/____   /\ \ \\ \     ',
-      \ '    /\ \/\ \\/\ \  / __` __`\       / /  /  \ \ \\ \_   ',
-      \ '    \ \ \_/ |\ \ \/\ \/\ \/\ \     / /  / __ \ \__  __\ ',
-      \ '     \ \___/  \ \_\ \_\ \_\ \_\   / /  / /\_\ \/_/\_\_/ ',
-      \ '      \/__/    \/_/\/_/\/_/\/_/   \/__/  \/_/    \/_/   ',
-      \ '                                                        ',
+      \ '                                  ________  _______      ',
+      \ '             __                  /\_______\/\  ___ \     ',
+      \ '     __  __ /\_\    ___ ___     / / ___   /\ \ \ /\ \    ',
+      \ '    /\ \/\ \\/\ \  / __` __`\  / / /_\/  /  \ \ \  \ \   ',
+      \ '    \ \ \_/ |\ \ \/\ \/\ \/\ \/ /  __   / __ \ \ \__\ \  ',
+      \ '     \ \___/  \ \_\ \_\ \_\ \_\/ /_\/  / /\_\ \ \______\ ',
+      \ '      \/__/    \/_/\/_/\/_/\/_/_______/  \/_/  \/______/ ',
+      \ '                                                         ',
       \ ]
 " }}}
 
@@ -2243,7 +2223,7 @@ if (g:isWindows && g:isGUI) && has("libcall")
     "映射 F11 切换全屏vim, 全屏后再隐藏菜单栏、工具栏、滚动条效果更好
     noremap <F11> <ESC>:call ToggleFullScreen()<CR>
     "切换Vim是否在最前面显示
-    nnoremap <C-t> <ESC>:call SwitchVimTopMostMode()<CR>
+    nnoremap <C-T> <ESC>:call SwitchVimTopMostMode()<CR>
     "减少Vim窗体的透明度
     nnoremap <C-up> <ESC>:call SetAlpha(+10)<CR>
     "增加Vim窗体的不透明度

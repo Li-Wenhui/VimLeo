@@ -209,6 +209,7 @@ g:calendar_navi	calendar.txt	/*g:calendar_navi*
 g:calendar_navi_label	calendar.txt	/*g:calendar_navi_label*
 g:calendar_weeknm	calendar.txt	/*g:calendar_weeknm*
 g:calendar_wruler	calendar.txt	/*g:calendar_wruler*
+help-tags	tags	1
 latex-support	latexsupport.txt	/*latex-support*
 latexsupport	latexsupport.txt	/*latexsupport*
 latexsupport-Ctrl-j	latexsupport.txt	/*latexsupport-Ctrl-j*
