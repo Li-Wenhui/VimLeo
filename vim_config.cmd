@@ -37,22 +37,22 @@ if /i "%xz%"=="0" goto :end
 echo 输入不正确 请重新开始... & goto start
 
 :inst32
-if not exist "%filePath%vim74\complete-x86.7z" echo. &echo 没有找到vim74_x86.zip! 请按任意键回到主菜单... &pause>nul &goto start
-cd "%filePath%vim74"
+if not exist "%filePath%vim80\complete-x86.7z" echo. &echo 没有找到complete-x86.7z! 请按任意键回到主菜单... &pause>nul &goto start
+cd "%filePath%vim80"
 7z x -y complete-x86.7z
 echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
 :inst64
-if not exist "%filePath%vim74\complete-x64.7z" echo. &echo 没有找到vim74_x64.zip! 请按任意键回到主菜单... &pause>nul &goto start
-cd "%filePath%vim74"
+if not exist "%filePath%vim80\complete-x64.7z" echo. &echo 没有找到complete-x64.7z! 请按任意键回到主菜单... &pause>nul &goto start
+cd "%filePath%vim80"
 7z x -y complete-x64.7z
 echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
 :addreg
 reg add "HKEY_CLASSES_ROOT\*\shell\Edit with &Vim"
-reg add "HKEY_CLASSES_ROOT\*\shell\Edit with &Vim\command" /v "" /t "REG_SZ" /d "\"%filePath%vim74\gvim.exe\" -p --remote-tab-silent \"%%1%\"" /f
+reg add "HKEY_CLASSES_ROOT\*\shell\Edit with &Vim\command" /v "" /t "REG_SZ" /d "\"%filePath%vim80\gvim.exe\" -p --remote-tab-silent \"%%1%\"" /f
 echo 任务完成，请按任意键回到主菜单... &pause>nul
 goto start
 
@@ -77,5 +77,5 @@ echo                     ╰ ----╯/█∨█\  ╰⊙═⊙╯       去海边
 echo                     ~~~~~~~~~~∏~~∏~~~~~~~~~~~.
 echo.
 echo 正在退出，请稍候(Waiting to exit) ...
-ping -n 10 127.1>nul
+ping -n 2 127.1>nul
 exit

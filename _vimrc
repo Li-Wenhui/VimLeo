@@ -468,6 +468,10 @@ Bundle 'gmarik/vundle'
 
 " 以下为要安装或更新的插件
 "
+
+" Run shell commands in background and output to quickfix
+Bundle 'skywind3000/asyncrun.vim'
+
 " quick commands to swtich between source files and header files
 Bundle 'a.vim'
 
