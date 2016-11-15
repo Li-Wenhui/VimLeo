@@ -4,6 +4,21 @@
 " 需要安装雅黑和consola 混合字库Microsoft_YaHei_Mono
 "
 " -----------------------------------------------------------------------------
+"
+" 快捷键定义方法：
+" [前缀]map 按键组合 对应的操作
+" map命令的组合:
+" 同Vim下的其他命令一样，命令的名字往往由好几段组成。前缀作为命令本身的修饰符，微调命令的效果。
+" 对于map而言，可能有这么几种前缀
+" nore 表示非递归，见下面的介绍
+" n    表示在普通模式下生效
+" v    表示在可视模式下生效
+" i    表示在插入模式下生效
+" c    表示在命令行模式下生效
+" 
+" 常规模式下输入 cS 清除行尾空格  
+" nnoremap cS :%s/\s\+$//g<CR>:noh<CR> 
+" 
 " {{{
 " Fn快捷键说明
 "
@@ -120,6 +135,8 @@
 "
 " ---------- 替换命令 ----------
 "
+" :%s/\s\+$//g:noh             --清除行尾空格
+" :%s/\r$//g:noh               --清除行尾 ^M 符号
 " :3,5s/regexp/repstr/[flags]  --替换3-5行的匹配内容
 " :s/regexp/repstr/[flags]     --在当前行中替换
 " :%s/regexp/repstr/[flags]    --全文替换匹配内容
@@ -196,7 +213,7 @@
 " Ctrl + X                   --将当前光标所在数字自减1        [仅普通模式可用]
 " :g/^/m0                    --将整个文件所有行排列顺序颠倒   [命令模式]
 " m字符       and '字符      --标记位置 and 跳转到标记位置
-" q字符 xxx q and @字符      --录制宏   and 执行宏
+" q字符 xxx q and @字符      --录制宏 and 执行宏
 "
 " ---------- 代码折叠 ----------
 "
@@ -427,6 +444,7 @@ func! RemoveTabs()
     exec '%s/  / /g'
   end
 endfunc
+"将tab替换为空格
 
 inoremap <Leader>rt <ESC>:call RemoveTabs()<CR>
 nnoremap <Leader>rt :call RemoveTabs()<CR>
@@ -482,7 +500,7 @@ Bundle 'Align'
 Bundle 'jiangmiao/auto-pairs'
 
 " quickly and easily switch between buffers
-Bundle 'bufexplorer.zip'
+Bundle 'bufexplorer'
 
 " convenice way to use ctags and cscope in vim
 Bundle 'ccvext.vim'
@@ -506,8 +524,10 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'OmniCppComplete'
 
 " 代码块的自动补全
-Bundle 'msanders/snipmate.vim'
-
+Bundle 'MarcWeber/vim-addon-mw-utils'
+Bundle 'tomtom/tlib_vim'
+Bundle 'garbas/vim-snipmate'
+        
 " 代码块的自动补全
 Bundle 'drmingdrmer/xptemplate'
 
@@ -543,6 +563,9 @@ Bundle 'tpope/vim-markdown'
 
 " markdown实时预览
 Bundle 'iamcco/markdown-preview.vim'
+
+" 插入markdown目录
+Bundle 'mzlogin/vim-markdown-toc'
 
 " 括号显示增强
 Bundle 'kien/rainbow_parentheses.vim'
@@ -587,7 +610,7 @@ Bundle 'octol/vim-cpp-enhanced-highlight'
 Bundle 'derekwyatt/vim-fswitch'
 
 " 自动生成标签并引入
-Bundle 'vim-scripts/indexer.tar.gz'
+Bundle 'vim-scripts/indexer'
 Bundle 'vim-scripts/DfrankUtil'
 Bundle 'vim-scripts/vimprj'
 
@@ -652,9 +675,10 @@ filetype plugin on                                    "针对不同的文件类�
 filetype indent on                                    "针对不同的文件类型采用不同的缩进
 set smartindent                                       "启用智能对齐方式
 set expandtab                                         "将Tab键转换为空格
-set tabstop=2                                         "设置Tab键的宽度为2个空格
-set shiftwidth=2                                      "换行时自动缩进2个空格
+set tabstop=4                                         "设置Tab键的宽度为4个空格
+set shiftwidth=4                                      "换行时自动缩进4个空格
 set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
+set iskeyword+=_,$,@,%,#,-                            "带有这些符号的单词不要被换行分割
 set foldenable                                        "启用折叠
 set foldlevel=9999                                    "打开后不自动折叠
 set foldmethod=indent                                 "indent 折叠方式
@@ -665,7 +689,7 @@ set clipboard+=unnamed                                " 与windows共享剪贴�
 set autoread                                          "当文件在外部被修改，自动更新该文件
 "set ignorecase                                        "搜索模式里忽略大小写
 set smartcase                                         "如果搜索模式包含大写字符，不使用 'ignorecase' 选项，
-"只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用
+                                                      "只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用
 " set noincsearch                                       "在输入要搜索的文字时，取消实时匹配
 
 " 启用每行超过80列的字符提示（字体变蓝并加下划线），不启用就注释掉
@@ -717,7 +741,7 @@ endif
 "set nowrap                                          "设置不自动换行
 set wrap                                            "设置自动换行
 set shortmess=atI                                   "启动的时候不显示援助索马里儿童的提示
-"set guicursor=a:blinkon0                                  "禁止光标闪烁
+"set guicursor=a:blinkon0                           "禁止光标闪烁
 set virtualedit=onemore
 
 " 设置 gVim 窗口初始位置及大小
@@ -730,9 +754,10 @@ endif
 " 设置配色方案
   " set background=light
   set background=dark
+
   colorscheme atom-dark
   " colorscheme solarized
-
+  " colorscheme molokai'
 " }}}
 
 
@@ -839,26 +864,34 @@ let g:spchkdialect = "usa"                            " (or "can" or "uk")
 autocmd BufNewFile *.cpp,*.[ch],*.sh,*.java,*.py exec ":call SetTitle()"
 ""定义函数SetTitle，自动插入文件头
 func! SetTitle()
-  "如果文件类型为.sh文件
-  if &filetype == 'sh'
-    call setline(1,          "\###############################################################################")
-    call append(line("."),   "\# File Name: ".expand("%"))
-    call append(line(".")+1, "\# Author: ")
-    call append(line(".")+2, "\# E-Mail: ")
-    call append(line(".")+3, "\# Date: ".strftime("%Y-%m-%d"))
-    call append(line(".")+4, "\###############################################################################")
-    call append(line(".")+5, "\#!/bin/bash")
-    call append(line(".")+6, "")
-  elseif &filetype == 'python'
-    call append(line("."),   "\#-*- coding:utf-8 -*-")
-    call append(line(".")+1, "\#Filename: ".expand("%"))
-    call append(line(".")+2, "\#Author: ")
-    call append(line(".")+3, "\#E-Mail: ")
-    call append(line(".")+4, "\#Date: ".strftime("%Y-%m-%d"))
-    call append(line(".")+5, "\#Description: ")
-    call append(line(".")+6, "")
-  endif
-
+    "如果文件类型为.sh文件
+    if &filetype == 'sh'
+        call setline(1,          "\###############################################################################")
+        call append(line("."),   "\# File Name: ".expand("%"))
+        call append(line(".")+1, "\# Author: ")
+        call append(line(".")+2, "\# E-Mail: ")
+        call append(line(".")+3, "\# Date: ".strftime("%Y-%m-%d"))
+        call append(line(".")+4, "\###############################################################################")
+        call append(line(".")+5, "\#!/bin/bash")
+        call append(line(".")+6, "")
+    elseif &filetype == 'python'
+        call append(line("."),   "\#-*- coding:utf-8 -*-")
+        call append(line(".")+1, "\#Filename: ".expand("%"))
+        call append(line(".")+2, "\#Author: ")
+        call append(line(".")+3, "\#E-Mail: ")
+        call append(line(".")+4, "\#Date: ".strftime("%Y-%m-%d"))
+        call append(line(".")+5, "\#Description: ")
+        call append(line(".")+6, "")
+	else 
+		call setline(1, "/*************************************************************************") 
+		call append(line("."), "	> File Name: ".expand("%")) 
+		call append(line(".")+1, "	> Author: ") 
+		call append(line(".")+2, "	> Mail: ") 
+		call append(line(".")+3, "	> Created Time: ".strftime("%c")) 
+		call append(line(".")+4, " ************************************************************************/") 
+		call append(line(".")+5, "")
+    endif
+    
   "新建文件后，自动定位到文件末尾
   autocmd BufNewFile * normal G
 endfunc
@@ -1317,9 +1350,9 @@ function! ViewInBrowser(name)
 
       "浏览器路径设置，路径中使用'/'斜杠，更改路径请更改双引号里的内容
       "下面只启用了系统IE浏览器，如需启用其它的可将其取消注释（得先安装，并配置好安装路径），也可按需增减
-      " let SystemIE = "C:/progra~1/intern~1/iexplore.exe"  "系统自带IE目录
+      let SystemIE = "C:/progra~1/intern~1/iexplore.exe"  "系统自带IE目录
       " let IETester = "F:/IETester/IETester.exe"           "IETester程序目录（可按实际更改）
-      let Chrome = "C:/Users/leo/AppData/Local/Google/Chrome/Application/chrome.exe"                 "Chrome程序目录（可按实际更改）
+      " let Chrome = "C:/Users/leo/AppData/Local/Google/Chrome/Application/chrome.exe"                 "Chrome程序目录（可按实际更改）
       " let Firefox = "D:/PortarbleStartup/yangguangheziFirefox/Firefox/firefox.exee"              "Firefox程序目录（可按实际更改）
       " let Opera = "F:/Opera/opera.exe"                    "Opera程序目录（可按实际更改）
       " let Maxthon = "C:/Progra~2/Maxthon/Bin/Maxthon.exe" "Maxthon程序目录（可按实际更改）
@@ -1333,11 +1366,11 @@ function! ViewInBrowser(name)
 
     "浏览器调用缩写，可根据实际增减，注意，上面浏览器路径中没有定义过的变量（等号右边为变量）不能出现在下面哟（可将其注释或删除）
     let l:browsers = {}                             "定义缩写字典变量，此行不能删除或注释
-    let l:browsers["cr"] = Chrome                   "Chrome浏览器缩写
+    " let l:browsers["cr"] = Chrome                   "Chrome浏览器缩写
     " let l:browsers["ff"] = Firefox                  "Firefox浏览器缩写
     " let l:browsers["op"] = Opera                    "Opera浏览器缩写
     " let l:browsers["ay"] = Maxthon                  "遨游浏览器缩写
-    " let l:browsers["ie"] = SystemIE                 "系统IE浏览器缩写
+    let l:browsers["ie"] = SystemIE                 "系统IE浏览器缩写
     " let l:browsers["ie6"] = IETester."-ie6"         "调用IETESTER工具以IE6预览缩写（变量加参数）
     " let l:browsers["ie7"] = IETester."-ie7"         "调用IETESTER工具以IE7预览缩写（变量加参数）
     " let l:browsers["ie8"] = IETester."-ie8"         "调用IETESTER工具以IE8预览缩写（变量加参数）

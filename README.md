@@ -79,11 +79,11 @@ vim 用户手册中，50％ 的例子都是在讲 vim 如何高效编写代码�
 
 我是个目标驱动的信奉者，本文内容，我会先给出优秀 C/C++ IDE 应具备哪些功能，再去探索如何通过 vim 的操作或插件来达到目标。最终至少要像这个样子：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/图形环境下 IDE 总揽.png" alt=""/><br />
+<img src="./images/图形环境下 IDE 总揽.png" alt=""/><br />
 （图形环境下 IDE 总揽）
 </div>
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/纯字符模式下总览.png" alt=""/><br />
+<img src="./images/纯字符模式下总览.png" alt=""/><br />
 （纯字符模式下 IDE 总揽）
 </div>
 
@@ -117,21 +117,10 @@ filetype plugin on
 快捷键。把 vim（非插件）常用操作设定成快捷键，提升效率：
 
 ```
-" 定义快捷键到行首和行尾
-nmap LB 0
-nmap LE $
 " 设置快捷键将选中文本块复制至系统剪贴板
-vnoremap <Leader>y "+y
+vnoremap <Leader>c "+y
 " 设置快捷键将系统剪贴板内容粘贴至 vim
-nmap <Leader>p "+p
-" 定义快捷键关闭当前分割窗口
-nmap <Leader>q :q<CR>
-" 定义快捷键保存当前窗口内容
-nmap <Leader>w :w<CR>
-" 定义快捷键保存所有窗口内容并退出 vim
-nmap <Leader>WQ :wa<CR>:q<CR>
-" 不做任何保存，直接退出 vim
-nmap <Leader>Q :qa!<CR>
+nmap <Leader>v "+p
 " 依次遍历子窗口
 nnoremap nw <C-W><C-W>
 " 跳转至右方的窗口
@@ -145,18 +134,6 @@ nnoremap <Leader>jw <C-W>j
 " 定义快捷键在结对符之间跳转
 nmap <Leader>M %
 ```
-
-立即生效。全文频繁变更 .vimrc，要让变更内容生效，一般的做法是先保存 .vimrc 再重启 vim，太繁琐了，增加如下设置，可以实现保存 .vimrc 时自动重启加载它：
-
-```
-" 让配置变更立即生效
-autocmd BufWritePost $MYVIMRC source $MYVIMRC
-```
-比如，我可以随时切换配色方案：
-<div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4%E7%AB%8B%E5%8D%B3%E7%94%9F%E6%95%88.gif" alt=""/><br />
-（配置变更立即生效）
-</div>
 
 其他。搜索、vim 命令补全等设置：
 
@@ -386,7 +363,7 @@ Bundle 'gosukiwi/vim-atom-dark'
 ```
 Bundle 'gosukiwi/vim-atom-dark''
 ```
-对应一个插件（这与 go 语言管理不同代码库的机制类似），后续若有新增插件，只需追加至该列表中即可。vundle 支持源码托管在 https://github.com/ 的插件，同时 vim 官网 http://www.vim.org/ 上的所有插件均在 https://github.com/vim-scripts/ 有镜像，所以，基本上主流插件都可以纳入 vundle 管理。具体而言，仍以 ctrlsf.vim 为例，它在 .vimrc 中配置信息为 dyng/ctrlsf.vim，vundle 很容易构造出其真实下载地址 https://github.com/dyng/ctrlsf.vim.git ，然后借助 git 工具进行下载及安装。
+对应一个插件，后续若有新增插件，只需追加至该列表中即可。vundle 支持源码托管在 https://github.com/ 的插件，同时 vim 官网 http://www.vim.org/ 上的所有插件均在 https://github.com/vim-scripts/ 有镜像，所以，基本上主流插件都可以纳入 vundle 管理。具体而言，以 ctrlsf.vim 为例，它在 .vimrc 中配置信息为 dyng/ctrlsf.vim，vundle 很容易构造出其真实下载地址 https://github.com/dyng/ctrlsf.vim.git ，然后借助 git 工具进行下载及安装。
 
 此后，需要安装插件，先找到其在 github.com 的地址，再将配置信息其加入 .vimrc 中。
 
@@ -395,7 +372,7 @@ Bundle 'gosukiwi/vim-atom-dark''
 
 玉不琢不成器，vim 不配不算美。刚安装好的 vim 朴素得吓人，这是与我同时代的软件么？
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E9%BB%98%E8%AE%A4%20vim%20%E7%95%8C%E9%9D%A2.png" alt=""/><br />
+<img src="./images/默认 vim 界面.png" alt=""/><br />
 （默认 vim 界面）
 </div>
 就我的审美观而言，至少有几个问题：语法高亮太单薄、主题风格太简陋、窗口元素太冗余、辅助信息太欠缺。
@@ -419,7 +396,7 @@ colorscheme atom-dark
 ```
 其中，不同主题都有暗/亮色系之分，这样三种主题六种风格，久不久换一换，给你不一样的心情：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/solarized%20%E4%B8%BB%E9%A2%98%E9%A3%8E%E6%A0%BC.png" alt=""/><br />
+<img src="./images/solarized 主题风格.png" alt=""/><br />
 （solarized 主题风格）
 </div>
 
@@ -456,7 +433,7 @@ endif
 
 重启 vim 后效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%8E%BB%E9%99%A4%E5%86%97%E4%BD%99%E7%AA%97%E5%8F%A3%E5%85%83%E7%B4%A0.png" alt=""/><br />
+<img src="./images/去除冗余窗口元素.png" alt=""/><br />
 （去除冗余窗口元素）
 </div>
 
@@ -494,7 +471,7 @@ set hlsearch
 
 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%B7%BB%E5%8A%A0%E8%BE%85%E5%8A%A9%E4%BF%A1%E6%81%AF.png" alt=""/><br />
+<img src="./images/添加辅助信息.png" alt=""/><br />
 （添加辅助信息）
 </div>
 
@@ -556,7 +533,7 @@ endif
 
 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E7%95%8C%E9%9D%A2%E7%BE%8E%E5%8C%96%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C.png" alt=""/><br />
+<img src="./images/界面美化最终效果.png" alt=""/><br />
 （界面美化最终效果）
 </div>
 图中，中英文混合字体看着是不是很舒服哈；增强后的状态栏，不仅界面漂亮多了，而且多了好些辅助信息（所在函数名、文件编码格式、文件类型）。
@@ -577,12 +554,12 @@ syntax on
 ```
 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE.png" alt=""/><br />
+<img src="./images/语法高亮.png" alt=""/><br />
 （语法高亮）
 </div>
 上图中 STL 容器模板类 unordered\_multimap 并未高亮，对滴，vim 对 C++ 语法高亮支持不够好（特别是 C++11/14 新增元素），必须借由插件 vim-cpp-enhanced-highlight（https://github.com/octol/vim-cpp-enhanced-highlight ）进行增强。效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%A2%9E%E5%BC%BA%20C%2B%2B11%20%E5%8F%8A%20STL%20%E7%9A%84%E8%AF%AD%E6%B3%95%E9%AB%98%E4%BA%AE.png" alt=""/><br />
+<img src="./images/增强 C++11 及 STL 的语法高亮.png" alt=""/><br />
 （增强 C++11 及 STL 的语法高亮）
 </div>
 vim-cpp-enhanced-highlight 主要通过 .vim/bundle/vim-cpp-enhanced-highlight/after/syntax/cpp.vim 控制高亮关键字及规则，所以，当你发现某个 STL 容器类型未高亮，那么将该类型追加进 cpp.vim 即可。如，initializer_list 默认并不会高亮，需要添加
@@ -619,7 +596,7 @@ set softtabstop=4
 
 很多编码规范建议缩进（代码嵌套类似）最多不能超过 4 层，但难免有更多层的情况，缩进一多，我那个晕啊：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%A4%9A%E5%B1%82%E7%BC%A9%E8%BF%9B.png" alt=""/><br />
+<img src="./images/多层缩进.png" alt=""/><br />
 （多层缩进）
 </div>
 
@@ -651,12 +628,12 @@ let g:indentLine_color_term = 239
 
 重启 vim 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%B8%8D%E8%BF%9E%E7%BB%AD%E7%9A%84%E7%BC%A9%E8%BF%9B%E5%8F%AF%E8%A7%86%E5%8C%96.png" alt=""/><br />
+<img src="./images/不连续的缩进可视化.png" alt=""/><br />
 （不连续的缩进可视化）
 </div>
 断节？Indent Guides 通过识别制表符来绘制缩进连接线，断节处是空行，没有制表符，自然绘制不出来，算是个小 bug，但瑕不掩瑜，有个小技巧可以解决，换行-空格-退格：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%AE%8C%E7%BE%8E%E5%8F%AF%E8%A7%86%E5%8C%96%E7%BC%A9%E8%BF%9B.png" alt=""/><br />
+<img src="./images/完美可视化缩进.png" alt=""/><br />
 （完美可视化缩进）
 </div>
 
@@ -674,7 +651,7 @@ set nofoldenable
 
 操作：za，打开或关闭当前折叠；zM，关闭所有折叠；zR，打开所有折叠。效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%BB%A3%E7%A0%81%E6%8A%98%E5%8F%A0.gif" alt=""/><br />
+<img src="./images/代码折叠.gif" alt=""/><br />
 （代码折叠）
 </div>
 
@@ -690,7 +667,7 @@ nmap <silent> <Leader>sw :FSHere<cr>
 ```
 这样，键入 ;sw 就能在实现文件和接口文件间切换。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%8E%A5%E5%8F%A3%E6%96%87%E4%BB%B6%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E5%88%87%E6%8D%A2.gif" alt=""/><br />
+<img src="./images/接口文件与实现文件切换.gif" alt=""/><br />
 （接口文件与实现文件切换）
 </div>
 上图中，初始状态先打开了接口文件 MyClass.h，键入 ;sw 后，vim 在新 buffer 中打开实现文件 MyClass.cpp，并在当前窗口中显示；再次键入 ;sw 后，当前窗口切回接口文件。
@@ -707,7 +684,7 @@ vim 书签的使用很简单，在你需要收藏的代码行键入 mm，这样�
 
 vim 的书签分为两类，独立书签和分类书签。独立书签，书签名只能由字母（a-zA-Z）组成，长度最多不超过 2 个字母，并且，同个文件中，不同独立书签名中不能含有相同字母，比如，a 和 bD 可以同时出现在同个文件在，而 Fc 和 c 则不行。分类书签，书签名只能由可打印特殊字符（!@#$%^&\*()）组成，长度只能有 1 个字符，同个文件中，你可以把不同行设置成同名书签，这样，这些行在逻辑上就归类成相同类型的书签了。下图定义了名为 a 和 dF 两个独立书签（分别 259 行和 261 行）、名为 # 的一类分类书签（含 256 行和 264 行）、名为 @ 的一类分类书签（257 行），如下所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E7%8B%AC%E7%AB%8B%E4%B9%A6%E7%AD%BE%E5%92%8C%E5%88%86%E7%B1%BB%E4%B9%A6%E7%AD%BE.png" alt=""/><br />
+<img src="./images/独立书签和分类书签.png" alt=""/><br />
 （独立书签和分类书签）
 </div>
 
@@ -749,7 +726,7 @@ let g:SignatureMap = {
 
 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%8F%AF%E8%A7%86%E5%8C%96%E4%B9%A6%E7%AD%BE.gif" alt=""/><br />
+<img src="./images/可视化书签.gif" alt=""/><br />
 （可视化书签）
 </div>
 
@@ -959,7 +936,7 @@ long 将作为 short 的简要描述展示在 vim 的 tagbar 子窗口中；fold
 
 重启 vim 后，打开一个 C/C++ 源码文件，键入 <leader>tb，将在左侧的 tagbar 窗口中将可看到标签列表：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%9F%BA%E4%BA%8E%E6%A0%87%E7%AD%BE%E7%9A%84%E6%A0%87%E8%AF%86%E7%AC%A6%E5%88%97%E8%A1%A8.gif" alt=""/><br />
+<img src="./images/基于标签的标识符列表.gif" alt=""/><br />
 （基于标签的标识符列表）
 </div>
 从上图可知 tagbar 的几个特点：
@@ -987,7 +964,7 @@ long 将作为 short 的简要描述展示在 vim 的 tagbar 子窗口中；fold
 
 这时，你可以体验下初级的声明/定义跳转功能。把光标移到 main.cpp 的 one.printMsg() 那行的 printMsg 上，键入快捷键 g]，vim 将罗列出名为 printMsg 的所有标签候选列表，按需选择键入编号即可跳转进入。如下图：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BE%85%E9%80%89%E6%A0%87%E7%AD%BE.png" alt=""/><br />
+<img src="./images/待选标签.png" alt=""/><br />
 （待选标签）
 </div>
 
@@ -1003,7 +980,7 @@ nmap <Leader>tp :tprevious<CR>
 ```
 等等，这还不行，vim 中有个叫标签栈（tags stack）的机制，:tnext、:tprevious 只能遍历已经压入标签栈内的标签，所以，你在遍历前需要通过快捷键 ctrl-] 将光标所在单词匹配的所有标签压入标签栈中，然后才能遍历。不说复杂了，以后你只需先键入 ctrl-]，若没跳转至需要的标签，再键入 <leader>tn 往后或者 <leader>tp 往前遍历即可。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%9F%BA%E4%BA%8E%E6%A0%87%E7%AD%BE%E7%9A%84%E8%B7%B3%E8%BD%AC.gif" alt=""/><br />
+<img src="./images/基于标签的跳转.gif" alt=""/><br />
 （基于标签的跳转）
 </div>
 
@@ -1071,7 +1048,7 @@ nnoremap <Leader>sp :CtrlSF<CR>
 
 太性感了，以关键字 CmdlineOption 为例，如下所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%86%85%E5%AE%B9%E6%9F%A5%E6%89%BE.gif" alt=""/><br />
+<img src="./images/内容查找.gif" alt=""/><br />
 （内容查找）
 </div>
 
@@ -1085,7 +1062,7 @@ nnoremap <Leader>sp :CtrlSF<CR>
 
 快捷选中 ctrlsf 子窗口中的多个匹配项，关键还是这些匹配项分散在不同行的不同位置，这就需要多光标编辑功能，vim-multiple-cursors 插件（https://github.com/terryma/vim-multiple-cursors ）为次而生。装好 vim-multiple-cursors 后，你随便编辑个文档，随便输入多个相同的字符串，先在可视化模式下选中其中一个，接着键入 ctrl-n，你会发现第二个该字符串也被选中了，持续键入 ctrl-n，你可以选中所有相同的字符串，把这个功能与 ctrlsf 结合，你来感受下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E6%8D%B7%E6%9B%BF%E6%8D%A2.gif" alt=""/><br />
+<img src="./images/快捷替换.gif" alt=""/><br />
 （快捷替换）
 </div>
 上图中，我想将 prtHelpInfo() 更名为 showHelpInfo()，先通过 ctrlsf 找到工程中所有 prtHelpInfo，然后直接在 ctrlsf 子窗口中选中第一个 ptr，再通过 vim-multiple-cursors 选中第二个 ptr，接着统一删除 ptr 并统一键入 show，最后保存并重新加载替换后的文件。
@@ -1204,12 +1181,12 @@ nnoremap <Leader>rwc :call Replace(1, 1, input('Replace '.expand('<cword>').' wi
 
 比如，我将工程的所有 *.cpp 和 *.h 中的关键字 MyClassA 按不确认且整词匹配模式替换成 MyClass，所以注释中的关键字不会被替换掉。如下所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%B8%8D%E7%A1%AE%E8%AE%A4%E4%B8%94%E6%95%B4%E8%AF%8D%E5%8C%B9%E9%85%8D%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%9B%BF%E6%8D%A2.gif" alt=""/><br />
+<img src="./images/不确认且整词匹配模式的替换.gif" alt=""/><br />
 （不确认且整词匹配模式的替换）
 </div>
 又比如，对当前文件采用需确认且无须整词匹配的模式进行替换，你会看到注释中的关键字也被替换了：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E7%A1%AE%E8%AE%A4%E4%B8%94%E6%97%A0%E9%A1%BB%E6%95%B4%E8%AF%8D%E5%8C%B9%E9%85%8D%E6%A8%A1%E5%BC%8F%E7%9A%84%E6%9B%BF%E6%8D%A2.gif" alt=""/><br />
+<img src="./images/确认且无须整词匹配模式的替换.gif" alt=""/><br />
 （确认且无须整词匹配模式的替换）
 </div>
 
@@ -1229,7 +1206,7 @@ nnoremap <Leader>rwc :call Replace(1, 1, input('Replace '.expand('<cword>').' wi
 
 如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%85%B3%E6%B3%A8%E9%87%8A.gif" alt=""/><br />
+<img src="./images/快速开/关注释.gif" alt=""/><br />
 （快速开/关注释）
 </div>
 
@@ -1255,6 +1232,7 @@ if (${1:/* condition */}) {
 } 
 endsnippet
 ```
+
 其中，snippet 和 endsnippet 用于表示模板的开始和结束；if 是模板名；"if statement" 是模板描述，你可以把多个模板的模板名定义成一样（如，if () {} 和 if () {} else {} 两模板都定义成相同模板名 if），在模板描述中加以区分（如，分别对应 "if statement" 和 "if-else statement"），这样，在 YCM（重量级智能补全插件） 的补全列表中可以根据模板描述区分选项不同模板；i 是模板控制参数，用于控制模板补全行为，具体参见“快速编辑结对符”一节；${1}、${2} 是 \<tab> 跳转的先后顺序。
 
 新版 UltiSnips 并未自带预定义的代码模板，你可以从 https://github.com/honza/vim-snippets 获取各类语言丰富的代码模板，也可以重新写一套符合自己编码风格的模板。无论哪种方式，你需要在 .vimrc 中设定该模板所在目录名，以便 UltiSnips 寻找到。比如，我自定义的代码模板文件 cpp.snippets，路径为 ~/.vim/bundle/ultisnips/mysnippets/cpp.snippets，对应设置如下：
@@ -1454,7 +1432,7 @@ let g:UltiSnipsJumpBackwardTrigger="<leader><s-tab>"
 
 效果如下：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%A8%A1%E6%9D%BF%E8%A1%A5%E5%85%A8.gif" alt=""/><br />
+<img src="./images/模板补全.gif" alt=""/><br />
 （模板补全）
 </div>
 
@@ -1508,7 +1486,7 @@ set tags+=/usr/include/c++/4.8/stdcpp.tags
 ```
 后续你就可以进行 C++ 标准库的代码补全，比如，在某个 string 对象名输入 . 时，vim 自动显示成员列表。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%9F%BA%E4%BA%8E%E6%A0%87%E7%AD%BE%E7%9A%84%20C%2B%2B%20%E6%A0%87%E5%87%86%E5%BA%93%E8%A1%A5%E5%85%A8.png" alt=""/><br />
+<img src="./images/基于标签的 C++ 标准库补全.png" alt=""/><br />
 （基于标签的 C++ 标准库补全）
 </div>
 
@@ -1573,7 +1551,7 @@ class MyClass
 ```
 在 MyClass.cpp 中生成成员函数的实现框架，如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%8E%A5%E5%8F%A3%E7%94%9F%E6%88%90%E5%AE%9E%E7%8E%B0.gif" alt=""/><br />
+<img src="./images/接口生成实现.gif" alt=""/><br />
 （接口生成实现）
 </div>
 MyClass.cpp 中我键入 protodef 定义的快捷键 \<leader>PP，自动生成了函数框架。
@@ -1619,7 +1597,7 @@ nmap <Leader>man :Man 3 <cword><CR>
 ```
 需要查看时，在 vim 中键入输入 :Man fork 或者 :Man std::vector （注意大小写）即可在新建分割子窗口中查看到函数参考信息，为了方便，我设定了快捷键 \<Leader>man，这样，光标所在单词将被传递给 :Man 命令，不用再手工键入，如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BA%93%E4%BF%A1%E6%81%AF%E5%8F%82%E8%80%83.gif" alt=""/><br />
+<img src="./images/库信息参考.gif" alt=""/><br />
 （库信息参考）
 </div>
 
@@ -1659,7 +1637,7 @@ let NERDTreeAutoDeleteBuffer=1
 
 常用操作：回车，打开选中文件；r，刷新工程目录文件列表；I（大写），显示/隐藏隐藏文件；m，出现创建/删除/剪切/拷贝操作列表。键入 \<leader>fl 后，右边子窗口为工程项目文件列表，如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8.gif" alt=""/><br />
+<img src="./images/工程文件浏览.gif" alt=""/><br />
 （工程文件浏览）
 </div>
 
@@ -1669,7 +1647,7 @@ vim 的多文档编辑涉及三个概念：buffer、window、tab，这三个事�
 
 vim 中每打开一个文件，vim 就对应创建一个 buffer，多个文件就有多个 buffer，但默认你只看得到最后 buffer 对应的 window，通过插件 MiniBufExplorer（https://github.com/fholgado/minibufexpl.vim ，原始版本已停止更新且问题较多，该版本是其他人 fork 的新项目）可以把所有 buffer 罗列出来，并且可以显示多个 buffer 对应的 window。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/buffer%20%E5%88%97%E8%A1%A8.png" alt=""/><br />
+<img src="./images/buffer 列表.png" alt=""/><br />
 （buffer 列表）
 </div>
 我在 vim 中打开了 main.cpp、CMakeLists.txt、MyClass.cpp、MyClass.h 这四个文件，最上面子窗口（buffer 列表）罗列出的 [1:main.cpp][4:CMakeLists.txt][5:MyClass.cpp][6:MyClass.h] 就是对应的四个 buffer。当前显示了 main.cpp 和 MyClass.h 的两个 buffer，分别对应绿色区域和橙色区域的 window，这下对 buffer 和 window 有概念了吧。图中关于 buffer 列表再说明两点：
@@ -1689,13 +1667,13 @@ map <C-S-Tab> :MBEbp<cr>
 
 操作：一般通过 NERDtree 查看工程文件列表，选择打开多个代码文件后，MiniBufExplorer 在顶部自动创建 buffer 列表子窗口。通过前面配置，ctrl-tab 正向遍历 buffer，ctrl-shift-tab 逆向遍历（光标必须在 buffer 列表子窗口外）；在某个 buffer 上键入 d 删除光标所在的 buffer（光标必须在 buffer 列表子窗口内）：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%A4%9A%E6%96%87%E6%A1%A3%E7%BC%96%E8%BE%91.gif" alt=""/><br />
+<img src="./images/多文档编辑.gif" alt=""/><br />
 （多文档编辑）
 </div>
 
 默认时，打开的 window 占据几乎整个 vim 编辑区域，如果你想把多个 window 平铺成多个子窗口可以使用 MiniBufExplorer 的 s 和 v 命令：在某个 buffer 上键入 s 将该 buffer 对应 window 与先前 window 上下排列，键入 v 则左右排列（光标必须在 buffer 列表子窗口内）。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%9C%A8%E5%AD%90%E7%AA%97%E5%8F%A3%E4%B8%AD%E7%BC%96%E8%BE%91%E5%A4%9A%E6%96%87%E6%A1%A3.gif" alt=""/><br />
+<img src="./images/在子窗口中编辑多文档.gif" alt=""/><br />
 （在子窗口中编辑多文档）
 </div>
 图中，通过 vim 自身的 f 名字查找 buffer 序号可快速选择需要的 buffer。另外，编辑单个文档时，不会出现 buffer 列表。
@@ -1835,7 +1813,7 @@ nmap <Leader>m :wa<CR>:make<CR><CR>:cw<CR>
 ```
 分解说明下，m 为设定的一键编译快捷键，:wa\<CR> 保存所有调整文档内容，:make\<CR> 调用 make 命令，后面的 \<CR> 消除执行完 make 命令屏幕上“Press ENTER or type command to continue”的输入等待提示，:cw\<CR> 显示 quickfix（仅当有编译错误或警告时）。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%B8%80%E9%94%AE%E7%BC%96%E8%AF%91.gif" alt=""/><br />
+<img src="./images/一键编译.gif" alt=""/><br />
 （一键编译）
 </div>
 我新建了一个工程，编辑好 CMakeLists.txt，执行 :!cmake CMakeLists.txt，接着 \<leader>m 一键编译，quickfix 窗口显示了编译错误，光标自动定位到需要你解决的第一个编译错误，回车后光标自动调整到该错误对应的代码位置，修正后重新 \<leader>r，编译通过并运行生成的程序。
@@ -1876,7 +1854,7 @@ YCM 的整个静态分析过程分为如下几步：
 
 如下所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90.gif" alt=""/><br />
+<img src="./images/静态代码分析.gif" alt=""/><br />
 （静态代码分析）
 </div>
 
@@ -1903,13 +1881,13 @@ endsnippet
 ```
 这样，UltiSnips 只管光标前 1 个字符是否是 b，若是则补全 ()，不论 b 前是否有其他字符。类似，其他结对符模板都按此加上 i 控制参数。结对符模板完整定义参见上一节 cpp.snippets 示例。如下是几个快速输入结对符的演示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E9%80%9F%E8%BE%93%E5%85%A5%E7%BB%93%E5%AF%B9%E7%AC%A6.gif" alt=""/><br />
+<img src="./images/快速输入结对符.gif" alt=""/><br />
 （快速输入结对符）
 </div>
 
 另外，要想高效编辑结对符，你得了解 vim 自身的某些快捷键。比如，有如下字符串且光标在该字符串的任意字符上，这时在命令模式下键入 va) 后将选中包括括号在内的整个字符串：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E9%80%9F%E9%80%89%E4%B8%AD%E7%BB%93%E5%AF%B9%E7%AC%A6.gif" alt=""/><br />
+<img src="./images/快速选中结对符.gif" alt=""/><br />
 （快速选中结对符）
 </div>
 其中，v 是动作、a 是范围、) 是结对符。结对符命令的动作包括：选中 v、复制 y、删除 d、删除后插入 c；结对符命令的范围包括：含结对符 a、不含结对符 i。针对不同结对符，组合不同动作和范围就有 4\*2 种方式。比如，di{ 删除不含结对符 {} 的字符串，va\[ 将选中含结对符 [] 内的所有字符。
@@ -1927,7 +1905,7 @@ let g:wildfire_objects = ["i'", 'i"', "i)", "i]", "i}", "i>", "ip"]
 ```
 这样，在 vim 的命令模式下，一次空格选中最近一层结对符内的文本，两次则选中近两层内的文本，三次三层，依此类推；或者键入 3space，直接选中三层内的文本；若要取消，键入 shift-space 即可。另外，结对符类型也可以在 wildfire_objects 变量中指定。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E9%80%9F%E9%80%89%E4%B8%AD%E7%BB%93%E5%AF%B9%E7%AC%A6%E6%96%87%E6%9C%AC.gif" alt=""/><br />
+<img src="./images/快速选中结对符文本.gif" alt=""/><br />
 （快速选中结对符文本）
 </div>
 
@@ -1937,7 +1915,7 @@ undo，编辑器世界中的后悔药，让你有机会撤销最近一步或多�
 
 还是前面的例子，分三步依次输入完 ABC 后，一次 undo 变成 AB，这时，输入 D，之后，无论你多少次 undo 都不可能再找回 C，究其原因，D 是彻底覆盖了 C，而不是与 C 形成两个分支，如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%B8%8D%E6%94%AF%E6%8C%81%E5%88%86%E6%94%AF%E7%9A%84%20undo.gif" alt=""/><br />
+<img src="./images/不支持分支的 undo.gif" alt=""/><br />
 （不支持分支的 undo）
 </div>
 
@@ -1951,7 +1929,7 @@ nnoremap <Leader>ud :GundoToggle<CR>
 ```
 gundo.vim 非常贴心，调用它后，你会在左侧看到一个分割为上下两个区域的子窗口。上半区域以可视化方式显示了整颗 undo 树，同时，用 @ 标识最后一步编辑操作，用序号标识各步编辑操作的先后顺序，用时长显示每步操作距离当前消耗时间。下半区域展示了各个操作间的 diff 信息及其上下文，默认为选中那步操作与前一步操作间的 diff，键入 p 可以查看选中那步操作与最后一步操作（即有 @ 标识的那步）间的 diff，这对于找回多次编辑操作之前的环境非常有用。
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%94%AF%E6%8C%81%E5%88%86%E6%94%AF%E7%9A%84%20undo.gif" alt=""/><br />
+<img src="./images/支持分支的 undo.gif" alt=""/><br />
 （支持分支的 undo）
 </div>
 
@@ -1977,13 +1955,13 @@ vim 有两类快速移动光标的方式：一类是以单词为单位的移动�
 
 easymotion 只做一件事：把满足条件的位置用 [;A~Za~z] 间的标签字符标出来，找到你想去的位置再键入对应标签字符即可快速到达。比如，上面的例子，假设光标在行首，我只需键入 \<leader>\<leader>fa （为避免与其他快捷键冲突，easymotion 采用两次 \<leader> 作为前缀键），所有的字符 a 都被重新标记成 a、b、c、d、e、f 等等标签（原始内容不会改变），f 标签为希望移动去的位置，随即键入 f 即可到达。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%BF%AB%E9%80%9F%E7%A7%BB%E5%8A%A8.gif" alt=""/><br />
+<img src="./images/快速移动.gif" alt=""/><br />
 （快速移动）
 </div>
 
 类似，前面提过的 w、e、b、ge、F、j、k 等命令在 easymotion 作用下也能实现快速移动，其中，j 和 k 可跨行移动。同时，你还可以搭配 v 选中命令、d 删除命令、y 拷贝命令，比如，v\<leader>\<leader>fa，快速选中光标当前位置到指定字符 a 之间的文本，d\<leader>\<leader>fa，快速删除光标当前位置到指定字符 a 之间的文本，下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E6%90%AD%E9%85%8D%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4%E7%9A%84%E5%BF%AB%E9%80%9F%E7%A7%BB%E5%8A%A8.gif" alt=""/><br />
+<img src="./images/搭配操作命令的快速移动.gif" alt=""/><br />
 （搭配操作命令的快速移动）
 </div>
 
@@ -1995,7 +1973,7 @@ easymotion 只做一件事：把满足条件的位置用 [;A~Za~z] 间的标签�
 
 第二个需求，按照一般逻辑，应该通过 firefox 的某款插件来实现，的确，Markdown Viewer 看起来是干这个事儿的，但它响应速度缓慢、中文显示乱码、无法即时渲染等等问题让我无法接受。网上倒是有些即时渲染 markdown 的网站，比如，https://stackedit.io/editor ，左侧编辑右侧显示，所见即所得，但这又无法让我使用 vim，不行。还是回到 vim 身上想办法，vim-instant-markdown 来了。有了这款 vim 插件，一旦你启用 vim 编辑 markdown 文档，vim-instant-markdown 自动开启 firefox 为你显示 markdown 最终效果，如果你在 vim 中变更了文档内容，vim-instant-markdown 即时渲染、firefox 同步更新，太棒了！
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/markdown%20%E5%8D%B3%E6%97%B6%E6%B8%B2%E6%9F%93.gif" alt=""/><br />
+<img src="./images/markdown 即时渲染.gif" alt=""/><br />
 （markdown 即时渲染）
 </div>
 
@@ -2021,13 +1999,13 @@ npm -g install instant-markdown-d
 
 比如，我在插入模式下依次输入了中文的一二四三，本意是想输入一二三四，下意识地键入 esc 切换为命令模式，键入 x 剪切三，再键入 P 将三粘贴至四前。谁知，在键入 x 时，由于输入法仍保留在先前的中文状态下，导致 vim 的命令模式无法接收到命令，必须得再次键入 shift 切换至英文状态。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E4%B8%AD%E6%96%87%E7%8A%B6%E6%80%81%E8%AE%A9%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E6%97%A0%E6%95%88.gif" alt=""/><br />
+<img src="./images/中文状态让命令模式无效.gif" alt=""/><br />
 （中文状态让命令模式无效）
 </div>
 
 这很不协调，我希望，在插入模式下输入完中文，切换至命令模式后，即便先前是中文输入状态，也不影响我正常使用命令模式，甚至再次切回插入模式后，能保持先前的输入状态。来了，fcitx.vim（https://github.com/lilydjwg/fcitx.vim ）就是我要的。对，前提是你系统中用的是 fcitx 输入法（为何不用 scim、ibus？https://github.com/yangyangwithgnu/the_new_world_linux#7.4 ）。装好这个插件后，我们再看看刚才的例子，在中文状态下从插入模式切换至命令模式，键入 x、P 调整完四和三顺序后，重新切换至插入模式，输入法状态仍保持中文。如下图所示：
 <div align="center">
-<img src="https://git.oschina.net/liwenhui/LeoVim/tree//master/images/%E5%8D%B3%E4%BE%BF%E4%B8%AD%E6%96%87%E7%8A%B6%E6%80%81%E4%B9%9F%E4%B8%8D%E5%BD%B1%E5%93%8D%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F.gif" alt=""/><br />
+<img src="./images/即便中文状态也不影响命令模式.gif" alt=""/><br />
 （即便中文状态也不影响命令模式）
 </div>
 
