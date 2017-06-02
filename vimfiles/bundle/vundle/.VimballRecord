@@ -1,1 +1,0 @@
-supertab.vmb: call delete('D:\PortarbleStartup\gVimPortable_7.4\vimfiles\bundle\vundle/doc/supertab.txt')|call delete('D:\PortarbleStartup\gVimPortable_7.4\vimfiles\bundle\vundle/plugin/supertab.vim')
