@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " New()
@@ -11,7 +11,7 @@
 " 'buffer' is a list of defactorized line [fname, lnum, content].
 "
 func! ctrlsf#class#paragraph#New(buffer) abort
-    let fname = a:buffer[0][0]
+    let fname = s:ShortenFilename(a:buffer[0][0])
 
     let paragraph = {
         \ 'filename'  : fname,
@@ -77,4 +77,17 @@ endf
 "
 func! ctrlsf#class#paragraph#TrimTail() abort dict
     call remove(self.lines, -1)
+endf
+
+" ShortenFilename()
+"
+" Simplify filename into a relative path if possible
+"
+func! s:ShortenFilename(filename) abort
+    let i = stridx(a:filename, getcwd())
+    if i != 0
+        return a:filename
+    else
+        return strpart(a:filename, i+strlen(getcwd())+1)
+    endif
 endf

@@ -29,7 +29,7 @@ Copy `asyncrun.vim` to your `~/.vim/plugin` or use Vundle to install it from `sk
 #### Async run gcc to compile current file
 	:AsyncRun gcc % -o %<
 	:AsyncRun g++ -O3 "%" -o "%<" -lpthread 
-This command will run gcc in the background and output to the quickfix window in realtime. Macro '`%`' stands for filename and '`%>`' represents filename without extension.
+This command will run gcc in the background and output to the quickfix window in realtime. Macro '`%`' stands for filename and '`%<`' represents filename without extension.
 
 #### Async run make
     :AsyncRun make
@@ -105,7 +105,7 @@ There can be some options before your `[cmd]`:
 
     -mode=0/1/2 - start mode: 0(async, default), 1(:make), 2(:!)
     -cwd=?      - initial directory, (use current directory if unset)
-    -save=0/1   - non-zero to save unsaved files before executing
+    -save=0/1/2 - non-zero to save current(1) or all(2) modified buffer(s) before executing.
     -program=?  - set to `make` to use `&makeprg`, `grep` to use `&grepprg` 
 	-post=?     - vimscript to exec after this job finished, spaces **must** be escaped to '\ '
 	-auto=?     - event name to trigger "QuickFixCmdPre/QuickFixCmdPost [name]" autocmd
@@ -136,6 +136,18 @@ stop the running job, when "!" is included, job will be stopped by signal KILL
 #### Variables:
 - g:asyncrun_code - exit code
 - g:asyncrun_status - 'running', 'success' or 'failure'
+
+#### Autocmd:
+
+```VimL
+autocmd User AsyncRunPre   - triggered before executing
+autocmd User AsyncRunStart - triggered after starting successfully
+autocmd User AsyncRunStop  - triggered when job finished
+```
+
+Note, `AsyncRunPre` is always likely to be invoked, but `AsyncRunStart` and `AsyncRunStop` will only be invoked if the job starts successfully. 
+
+When previous job is still running or vim job slot is full, AsyncRun may fail. In this circumstance, `AsyncRunPre` will be invoked but `AsyncRunStart` and `AsyncRunStop` will have no chance to trigger.
 
 #### Requirements:
 Vim 7.4.1829 is minimal version to support async mode. If you are use older versions, `g:asyncrun_mode` will fall back from `0/async` to `1/sync`. NeoVim 0.1.4 or later is also supported. 
@@ -170,6 +182,7 @@ Don't forget to read the [Frequently Asked Questions](https://github.com/skywind
 | [vim-fugitive](https://github.com/skywind3000/asyncrun.vim/wiki/Cooperate-with-famous-plugins#fugitive)  | perfect cooperation, asyncrun gets Gfetch/Gpush running in background |
 | [errormarker](https://github.com/skywind3000/asyncrun.vim/wiki/Cooperate-with-famous-plugins) | perfect cooperation, errormarker will display the signs on the error or warning lines |
 | [airline](https://github.com/skywind3000/asyncrun.vim/wiki/Cooperate-with-famous-plugins#vim-airline) | very well, airline will display status of background jobs |
+| [sprint](https://github.com/pedsm/sprint) | nice plugin who uses asyncrun to provide an IDE's run button to runs your code |
 | [netrw](https://github.com/skywind3000/asyncrun.vim/wiki/Get-netrw-using-asyncrun-to-save-remote-files) | netrw can save remote files on background now. Experimental, take your own risk | 
 
 
@@ -177,6 +190,10 @@ See: [Cooperate with famous plugins](https://github.com/skywind3000/asyncrun.vim
 
 ## History
 
+- 1.3.11 (2017-05-19): new option (-save=2) to save all modified files.
+- 1.3.10 (2017-05-04): remove trailing `^M` in NeoVim 2.0 on windows 
+- 1.3.9 (2016-12-23): minor bugs fixed, improve performance and compatibility.
+- 1.3.8 (2016-11-17): new autocmd AsyncRunPre/AsyncRunStart/AsyncRunStop, fixed cmd line window conflict. 
 - 1.3.7 (2016-11-13): new option 'g:asyncrun_timer' to prevent gui freeze by massive output.
 - 1.3.6 (2016-11-08): improve performance in quickfix_toggle, fixed small issue in bell ringing.
 - 1.3.5 (2016-11-02): new option "g:asyncrun_auto" to trigger QuickFixCmdPre/QuickFixCmdPost.

@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " s:DiffFile()
@@ -196,8 +196,9 @@ func! ctrlsf#edit#Save() abort
 
     " prompt to confirm save
     if g:ctrlsf_confirm_save
-        echo printf("%s files will be saved. Confirm? (Y/n)", len(changed))
-        let confirm = nr2char(getchar()) | redraw
+        call ctrlsf#log#Info(printf("%s files will be saved. Confirm? (Y/n)",
+                    \ len(changed)))
+        let confirm = nr2char(getchar()) | redraw!
         if !(confirm ==? "y" || confirm ==? "\r")
             call ctrlsf#log#Info("Cancelled.")
             return -1

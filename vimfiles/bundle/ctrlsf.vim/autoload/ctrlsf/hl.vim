@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " HighlightMatch()
@@ -15,24 +15,31 @@ func! ctrlsf#hl#HighlightMatch(...) abort
         return -1
     endif
 
-    let regex = printf('/%s/', escape(ctrlsf#opt#GetOpt("_vimhlregex"), '/'))
-    call ctrlsf#log#Debug("HighlightRegex: %s", regex)
+    let pattern = ctrlsf#opt#GetOpt("_vimhlregex")[ctrlsf#CurrentMode()]
+    call ctrlsf#log#Debug("HighlightRegex: %s", pattern)
 
-    exec printf('2match none | 2match %s %s', hlgroup, regex)
+    silent! call matchdelete(w:ctrlsf_match_hlid)
+    let w:ctrlsf_match_hlid = matchadd(hlgroup, pattern)
 endf
 
 " HighlightSelectedLine()
 "
 func! ctrlsf#hl#HighlightSelectedLine() abort
     " Clear previous highlight
-    silent! call matchdelete(b:ctrlsf_highlight_id)
+    silent! call matchdelete(w:ctrlsf_line_hlid)
 
     let pattern = '\%' . line('.') . 'l.*'
-    let b:ctrlsf_highlight_id = matchadd('ctrlsfSelectedLine', pattern, -1)
+    let w:ctrlsf_line_hlid = matchadd('ctrlsfSelectedLine', pattern, -1)
 endf
 
 " ClearSelectedLine()
 "
 func! ctrlsf#hl#ClearSelectedLine() abort
-    silent! call matchdelete(b:ctrlsf_highlight_id)
+    silent! call matchdelete(w:ctrlsf_line_hlid)
+endf
+
+" ReloadSyntax()
+"
+func! ctrlsf#hl#ReloadSyntax() abort
+    runtime syntax/ctrlsf.vim
 endf

@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language: php PHP 3/4/5/7
 " Maintainer: Jason Woofenden <jason@jasonwoof.com>
-" Last Change: Jul 27, 2016
+" Last Change: Apr 28, 2017
 " URL: https://jasonwoof.com/gitweb/?p=vim-syntax.git;a=blob;f=php.vim;hb=HEAD
 " Former Maintainers: Peter Hodge <toomuchphp-vim@yahoo.com>
 "         Debian VIM Maintainers <pkg-vim-maintainers@lists.alioth.debian.org>
@@ -11,32 +11,28 @@
 "       colourscheme, because elflord's colours will better highlight the break-points
 "       (Statements) in your code.
 "
-" Options:  php_sql_query = 1  for SQL syntax highlighting inside strings
-"           php_htmlInStrings = 1  for HTML syntax highlighting inside strings
-"           php_baselib = 1  for highlighting baselib functions
-"           php_asp_tags = 1  for highlighting ASP-style short tags
-"           php_parent_error_close = 1  for highlighting parent error ] or )
-"           php_parent_error_open = 1  for skipping an php end tag, if there exists an open ( or [ without a closing one
-"           php_oldStyle = 1  for using old colorstyle
-"           php_noShortTags = 1  don't sync <? ?> as php
-"           php_folding = 1  for folding classes and functions
-"           php_folding = 2  for folding all { } regions
-"           php_sync_method = x
-"                             x=-1 to sync by search ( default )
-"                             x>0 to sync at least x lines backwards
-"                             x=0 to sync from start
-"
-"       Added by Peter Hodge On June 9, 2006:
-"           php_special_functions = 1|0 to highlight functions with abnormal behaviour
-"           php_alt_comparisons = 1|0 to highlight comparison operators in an alternate colour
-"           php_alt_assignByReference = 1|0 to highlight '= &' in an alternate colour
-"
-"           Note: these all default to 1 (On), so you would set them to '0' to turn them off.
-"                 E.g., in your .vimrc or _vimrc file:
-"                   let php_special_functions = 0
-"                   let php_alt_comparisons = 0
-"                   let php_alt_assignByReference = 0
-"                 Unletting these variables will revert back to their default (On).
+" Options:
+"    Set to anything to enable:
+"       php_sql_query           SQL syntax highlighting inside strings
+"       php_htmlInStrings       HTML syntax highlighting inside strings
+"       php_baselib             highlighting baselib functions
+"       php_asp_tags            highlighting ASP-style short tags
+"       php_parent_error_close  highlighting parent error ] or )
+"       php_parent_error_open   skipping an php end tag, if there exists
+"                                 an open ( or [ without a closing one
+"       php_oldStyle            use old colorstyle
+"       php_noShortTags         don't sync <? ?> as php
+"    Set to a specific value:
+"       php_folding = 1         fold classes and functions
+"       php_folding = 2         fold all { } regions
+"       php_sync_method = x  where x is an integer:
+"                         -1  sync by search ( default )
+"                         >0  sync at least x lines backwards
+"                         0   sync from start
+"    Set to 0 to _disable_:      (Added by Peter Hodge On June 9, 2006)
+"       php_special_functions = 0      highlight functions with abnormal behaviour
+"       php_alt_comparisons = 0        comparison operators in an alternate colour
+"       php_alt_assignByReference = 0  '= &' in an alternate colour
 "
 "
 " Note:
@@ -495,7 +491,7 @@ syntax keyword phpSpecialFunction containedin=ALLBUT,phpComment,phpStringDouble,
 " Highlighting for __autoload slightly different from line above
 syntax keyword phpSpecialFunction containedin=ALLBUT,phpComment,phpStringDouble,phpStringSingle,phpIdentifier,phpMethodsVar
   \ __autoload
-highlight link phpSpecialFunction phpOperator
+hi def link phpSpecialFunction phpOperator
 
 " Highlighting for PHP5's built-in classes
 " - built-in classes harvested from get_declared_classes() in 5.1.4
@@ -518,14 +514,14 @@ syntax keyword phpClasses containedin=ALLBUT,phpComment,phpStringDouble,phpStrin
   \ DOMCharacterData DOMAttr DOMElement DOMText DOMComment DOMTypeinfo DOMUserDataHandler
   \ DOMLocator DOMConfiguration DOMCdataSection DOMDocumentType DOMNotation DOMEntity
   \ DOMEntityReference DOMProcessingInstruction DOMStringExtend DOMXPath
-highlight link phpClasses phpFunctions
+hi def link phpClasses phpFunctions
 
 " Highlighting for PHP5's built-in interfaces
 " - built-in classes harvested from get_declared_interfaces() in 5.1.4
 syntax keyword phpInterfaces containedin=ALLBUT,phpComment,phpStringDouble,phpStringSingle,phpIdentifier,phpMethodsVar
   \ Iterator IteratorAggregate RecursiveIterator OuterIterator SeekableIterator
   \ Traversable ArrayAccess Serializable Countable SplObserver SplSubject Reflector
-highlight link phpInterfaces phpConstant
+hi def link phpInterfaces phpConstant
 
 " option defaults:
 if ! exists('php_special_functions')
@@ -553,7 +549,7 @@ endif
 if php_alt_assignByReference
     " special highlighting for '=&' operator
     syntax match phpAssignByRef /=\s*&/ containedin=ALLBUT,phpComment,phpStringDouble,phpStringSingle
-    highlight link phpAssignByRef Type
+    hi def link phpAssignByRef Type
 endif
 
 if php_alt_comparisons
@@ -565,7 +561,7 @@ if php_alt_comparisons
   syntax case ignore
   syntax keyword phpComparison instanceof contained containedin=phpRegion
 
-  hi link phpComparison Statement
+  hi def link phpComparison Statement
 endif
 
 " ================================================================
@@ -645,21 +641,21 @@ hi def link phpTodo  Todo
 hi def link phpDocTodo Todo
 hi def link phpMemberSelector  Structure
 if exists("php_oldStyle")
-hi  phpIntVar guifg=Red ctermfg=DarkRed
-hi  phpEnvVar guifg=Red ctermfg=DarkRed
-hi  phpOperator guifg=SeaGreen ctermfg=DarkGreen
-hi  phpVarSelector guifg=SeaGreen ctermfg=DarkGreen
-hi  phpRelation guifg=SeaGreen ctermfg=DarkGreen
-hi  phpIdentifier guifg=DarkGray ctermfg=Brown
-hi  phpIdentifierSimply guifg=DarkGray ctermfg=Brown
+  hi def phpIntVar guifg=Red ctermfg=DarkRed
+  hi def phpEnvVar guifg=Red ctermfg=DarkRed
+  hi def phpOperator guifg=SeaGreen ctermfg=DarkGreen
+  hi def phpVarSelector guifg=SeaGreen ctermfg=DarkGreen
+  hi def phpRelation guifg=SeaGreen ctermfg=DarkGreen
+  hi def phpIdentifier guifg=DarkGray ctermfg=Brown
+  hi def phpIdentifierSimply guifg=DarkGray ctermfg=Brown
 else
-hi def link phpIntVar Identifier
-hi def link phpEnvVar Identifier
-hi def link phpOperator Operator
-hi def link phpVarSelector  Operator
-hi def link phpRelation Operator
-hi def link phpIdentifier Identifier
-hi def link phpIdentifierSimply Identifier
+  hi def link phpIntVar Identifier
+  hi def link phpEnvVar Identifier
+  hi def link phpOperator Operator
+  hi def link phpVarSelector  Operator
+  hi def link phpRelation Operator
+  hi def link phpIdentifier Identifier
+  hi def link phpIdentifierSimply Identifier
 endif
 
 

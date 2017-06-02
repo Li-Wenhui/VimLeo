@@ -42,8 +42,7 @@ file in the same directory as `gvim.exe`.
 
 Or, you can install MacVim with homebrew:
 
-    brew install macvim --with-cscope --with-lua
-    brew linkapps macvim
+    brew cask install macvim --with-cscope --with-lua
 
 To install Vim (as opposed to MacVim) with homebrew:
 
@@ -133,7 +132,6 @@ let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#enable_smart_case = 1
 " Set minimum syntax keyword length.
 let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 
 " Define dictionary.
 let g:neocomplete#sources#dictionary#dictionaries = {

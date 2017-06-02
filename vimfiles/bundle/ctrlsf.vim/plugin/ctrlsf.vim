@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " Loading Guard {{{1
@@ -46,8 +46,13 @@ endf
 " }}}
 
 " s:SearchCwordCmd() {{{2
-func! s:SearchCwordCmd(type, to_exec)
-    let cmd = ":\<C-U>" . a:type . " " . expand('<cword>')
+func! s:SearchCwordCmd(type, word_boundary, to_exec)
+    let cmd = ":\<C-U>" . a:type
+    if a:word_boundary
+        let cmd .= ' -R \b' . expand('<cword>') . '\b'
+    else
+        let cmd .= " " . expand('<cword>')
+    endif
     let cmd .= a:to_exec ? "\<CR>" : " "
     return cmd
 endf
@@ -97,6 +102,12 @@ if !exists('g:ctrlsf_confirm_save')
     let g:ctrlsf_confirm_save = 1
 endif
 " }}}
+"
+" g:ctrlsf_confirm_unsaving_quit {{{2
+if !exists('g:ctrlsf_confirm_unsaving_quit')
+    let g:ctrlsf_confirm_unsaving_quit = 1
+endif
+" }}}
 
 " g:ctrlsf_context {{{2
 if !exists('g:ctrlsf_context')
@@ -113,6 +124,12 @@ endif
 " g:ctrlsf_default_root {{{2
 if !exists('g:ctrlsf_default_root')
     let g:ctrlsf_default_root = 'cwd'
+endif
+" }}}
+
+" g:ctrlsf_default_view_mode {{{2
+if !exists('g:ctrlsf_default_view_mode')
+    let g:ctrlsf_default_view_mode = 'normal'
 endif
 " }}}
 
@@ -136,15 +153,18 @@ endif
 
 " g:ctrlsf_mapping {{{
 let s:default_mapping = {
-    \ "open"    : ["<CR>", "o"],
+    \ "open"    : ["<CR>", "o", "<2-LeftMouse>"],
     \ "openb"   : "O",
     \ "split"   : "<C-O>",
+    \ "vsplit"  : "",
     \ "tab"     : "t",
     \ "tabb"    : "T",
     \ "popen"   : "p",
+    \ "popenf"  : "P",
     \ "quit"    : "q",
     \ "next"    : "<C-J>",
     \ "prev"    : "<C-K>",
+    \ "chgmode" : "M",
     \ "pquit"   : "q",
     \ "loclist" : "",
     \ }
@@ -209,8 +229,8 @@ endif
 " }}}
 
 " Commands {{{1
-com! -n=* -comp=customlist,ctrlsf#comp#Completion CtrlSF         call ctrlsf#Search(<q-args>, 0)
-com! -n=* -comp=customlist,ctrlsf#comp#Completion CtrlSFQuickfix call ctrlsf#Search(<q-args>, 1)
+com! -n=* -comp=customlist,ctrlsf#comp#Completion CtrlSF         call ctrlsf#Search(<q-args>)
+com! -n=* -comp=customlist,ctrlsf#comp#Completion CtrlSFQuickfix call ctrlsf#Quickfix(<q-args>)
 com! -n=0                                         CtrlSFOpen     call ctrlsf#Open()
 com! -n=0                                         CtrlSFUpdate   call ctrlsf#Update()
 com! -n=0                                         CtrlSFClose    call ctrlsf#Quit()
@@ -219,21 +239,25 @@ com! -n=0                                         CtrlSFToggle   call ctrlsf#Tog
 " }}}
 
 " Maps {{{1
-nnoremap                 <Plug>CtrlSFPrompt    :CtrlSF<Space>
-nnoremap          <expr> <Plug>CtrlSFCwordPath <SID>SearchCwordCmd('CtrlSF', 0)
-nnoremap <silent> <expr> <Plug>CtrlSFCwordExec <SID>SearchCwordCmd('CtrlSF', 1)
-vnoremap          <expr> <Plug>CtrlSFVwordPath <SID>SearchVwordCmd('CtrlSF', 0)
-vnoremap <silent> <expr> <Plug>CtrlSFVwordExec <SID>SearchVwordCmd('CtrlSF', 1)
-nnoremap          <expr> <Plug>CtrlSFPwordPath <SID>SearchPwordCmd('CtrlSF', 0)
-nnoremap <silent> <expr> <Plug>CtrlSFPwordExec <SID>SearchPwordCmd('CtrlSF', 1)
+nnoremap                 <Plug>CtrlSFPrompt     :CtrlSF<Space>
+nnoremap          <expr> <Plug>CtrlSFCwordPath  <SID>SearchCwordCmd('CtrlSF', 0, 0)
+nnoremap <silent> <expr> <Plug>CtrlSFCwordExec  <SID>SearchCwordCmd('CtrlSF', 0, 1)
+nnoremap          <expr> <Plug>CtrlSFCCwordPath <SID>SearchCwordCmd('CtrlSF', 1, 0)
+nnoremap <silent> <expr> <Plug>CtrlSFCCwordExec <SID>SearchCwordCmd('CtrlSF', 1, 1)
+vnoremap          <expr> <Plug>CtrlSFVwordPath  <SID>SearchVwordCmd('CtrlSF', 0)
+vnoremap <silent> <expr> <Plug>CtrlSFVwordExec  <SID>SearchVwordCmd('CtrlSF', 1)
+nnoremap          <expr> <Plug>CtrlSFPwordPath  <SID>SearchPwordCmd('CtrlSF', 0)
+nnoremap <silent> <expr> <Plug>CtrlSFPwordExec  <SID>SearchPwordCmd('CtrlSF', 1)
 
-nnoremap                 <Plug>CtrlSFQuickfixPrompt    :CtrlSFQuickfix<Space>
-nnoremap          <expr> <Plug>CtrlSFQuickfixCwordPath <SID>SearchCwordCmd('CtrlSFQuickfix', 0)
-nnoremap <silent> <expr> <Plug>CtrlSFQuickfixCwordExec <SID>SearchCwordCmd('CtrlSFQuickfix', 1)
-vnoremap          <expr> <Plug>CtrlSFQuickfixVwordPath <SID>SearchVwordCmd('CtrlSFQuickfix', 0)
-vnoremap <silent> <expr> <Plug>CtrlSFQuickfixVwordExec <SID>SearchVwordCmd('CtrlSFQuickfix', 1)
-nnoremap          <expr> <Plug>CtrlSFQuickfixPwordPath <SID>SearchPwordCmd('CtrlSFQuickfix', 0)
-nnoremap <silent> <expr> <Plug>CtrlSFQuickfixPwordExec <SID>SearchPwordCmd('CtrlSFQuickfix', 1)
+nnoremap                 <Plug>CtrlSFQuickfixPrompt     :CtrlSFQuickfix<Space>
+nnoremap          <expr> <Plug>CtrlSFQuickfixCwordPath  <SID>SearchCwordCmd('CtrlSFQuickfix', 0, 0)
+nnoremap <silent> <expr> <Plug>CtrlSFQuickfixCwordExec  <SID>SearchCwordCmd('CtrlSFQuickfix', 0, 1)
+nnoremap          <expr> <Plug>CtrlSFQuickfixCCwordPath <SID>SearchCwordCmd('CtrlSFQuickfix', 1, 0)
+nnoremap <silent> <expr> <Plug>CtrlSFQuickfixCCwordExec <SID>SearchCwordCmd('CtrlSFQuickfix', 1, 1)
+vnoremap          <expr> <Plug>CtrlSFQuickfixVwordPath  <SID>SearchVwordCmd('CtrlSFQuickfix', 0)
+vnoremap <silent> <expr> <Plug>CtrlSFQuickfixVwordExec  <SID>SearchVwordCmd('CtrlSFQuickfix', 1)
+nnoremap          <expr> <Plug>CtrlSFQuickfixPwordPath  <SID>SearchPwordCmd('CtrlSFQuickfix', 0)
+nnoremap <silent> <expr> <Plug>CtrlSFQuickfixPwordExec  <SID>SearchPwordCmd('CtrlSFQuickfix', 1)
 " }}}
 
 " modeline {{{1

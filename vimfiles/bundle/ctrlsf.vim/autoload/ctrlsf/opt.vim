@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " option list of CtrlSF
@@ -62,7 +62,7 @@ func! ctrlsf#opt#GetOpt(name) abort
     if has_key(s:options, a:name)
         return s:options[a:name]
     else
-        return get(s:default, 'a:name', '')
+        return get(s:default, a:name, '')
     endif
 endf
 
@@ -143,14 +143,38 @@ func! ctrlsf#opt#GetPath() abort
             endfo
         endfo
     else
-        let path = {
-            \ 'project' : ctrlsf#fs#FindVcsRoot(),
-            \ 'cwd'     : getcwd(),
-            \ }[g:ctrlsf_default_root]
-        " If project root is not found, use current file
-        if empty(path)
-            let path = expand('%:p')
+        let path = ''
+
+        if g:ctrlsf_default_root ==# 'cwd'
+            let path = getcwd()
+        else
+            " default value for 'project'
+            let opt_sroot = 'f'
+            let opt_fbroot = 'f'
+
+            let opt_idx = stridx(g:ctrlsf_default_root, '+')
+            if opt_idx > -1
+                let opt_sroot = strpart(g:ctrlsf_default_root, opt_idx+1, 1)
+                let opt_fbroot = strpart(g:ctrlsf_default_root, opt_idx+2, 1)
+            endif
+
+            " try to find project root
+            if opt_sroot ==# 'f'
+                let path = ctrlsf#fs#FindVcsRoot()
+            elseif opt_sroot ==# 'w'
+                let path = ctrlsf#fs#FindVcsRoot(getcwd())
+            endif
+
+            " fallback to specified root
+            if empty(path)
+                if opt_fbroot ==# 'f'
+                    let path = expand('%:p')
+                elseif opt_fbroot ==# 'w'
+                    let path = getcwd()
+                endif
+            endif
         endif
+
         call add(path_tokens, shellescape(path))
     endif
 
@@ -193,6 +217,7 @@ endf
 "
 func! s:ParseOptions(options_str) abort
     let options = {}
+    let no_more_options = 0
     let tokens  = ctrlsf#lex#Tokenize(a:options_str)
 
     let i = 0
@@ -201,7 +226,10 @@ func! s:ParseOptions(options_str) abort
         let i += 1
 
         if !has_key(s:option_list, token)
-            if token =~# '^-'
+            if token == '--'
+              let no_more_options = 1
+              continue
+            elseif token =~# '^-' && !no_more_options
                 call ctrlsf#log#Error("Unknown option '%s'. If you are user
                     \ from pre-v1.0, please be aware of that CtrlSF no longer
                     \ supports all options of ack and ag since v1.0. Read
@@ -265,7 +293,10 @@ func! ctrlsf#opt#ParseOptions(options_str) abort
     let s:options["_vimregex"] = ctrlsf#pat#Regex()
 
     " vimhlregex
-    let s:options["_vimhlregex"] = ctrlsf#pat#HighlightRegex()
+    let s:options["_vimhlregex"] = {
+                \ 'normal': ctrlsf#pat#HighlightRegex('normal'),
+                \ 'compact': ctrlsf#pat#HighlightRegex('compact')
+                \ }
 
     call ctrlsf#log#Debug("Options: %s", string(s:options))
 endf

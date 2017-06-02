@@ -52,8 +52,8 @@ if !exists('s:doneMappings')
 	call IMAP ('{}', '{<++>}<++>', "tex")
 	call IMAP ('^^', '^{<++>}<++>', "tex")
 	call IMAP ('$$', '$<++>$<++>', "tex")
-	call IMAP ('==', '&=& ', "tex")
-	call IMAP ('~~', '&\approx& ', "tex")
+	call IMAP ('==', '&= ', "tex")
+	call IMAP ('~~', '&\approx ', "tex")
 	call IMAP ('=~', '\approx', "tex")
 	call IMAP ('::', '\dots', "tex")
 	call IMAP ('((', '\left( <++> \right)<++>', "tex")
@@ -69,7 +69,9 @@ if !exists('s:doneMappings')
 	call IMAP (g:Tex_Leader.'0', '^\circ', "tex")
 	call IMAP (g:Tex_Leader.'=', '\equiv', "tex")
 	call IMAP (g:Tex_Leader."\\",'\setminus', "tex")
-	call IMAP (g:Tex_Leader.'.', '\cdot', "tex")
+	if !g:Tex_SmartKeyDot
+		call IMAP (g:Tex_Leader.'.', '\cdot', "tex")
+	end
 	call IMAP (g:Tex_Leader.'*', '\times', "tex")
 	call IMAP (g:Tex_Leader.'&', '\wedge', "tex")
 	call IMAP (g:Tex_Leader.'-', '\bigcap', "tex")
@@ -127,7 +129,7 @@ if !exists('s:doneMappings')
 	call IMAP(g:Tex_Leader.'U', '\Upsilon', 'tex')
 	call IMAP(g:Tex_Leader.'W', '\Omega', 'tex')
 	" }}}
-	" ProtectLetters: sets up indentity maps for things like ``a {{{
+	" ProtectLetters: sets up identity maps for things like ``a {{{
 	" " Description: If we simply do
 	" 		call IMAP('`a', '\alpha', 'tex')
 	" then we will never be able to type 'a' after a tex-quotation. Since
@@ -140,15 +142,17 @@ if !exists('s:doneMappings')
 	" It does this for all printable lower ascii characters just to make sure
 	" we dont let anything slip by.
 	function! s:ProtectLetters(first, last)
-		let i = a:first
-		while i <= a:last
+		for i in range(a:first, a:last)
 			if nr2char(i) =~ '[[:print:]]'
+				if ( g:Tex_SmartKeyDot && nr2char(i) == '.' )
+							\ || ( g:Tex_SmartKeyQuote && nr2char(i) == '"' )
+					continue
+				endif
 				call IMAP('``'.nr2char(i), '``'.nr2char(i), 'tex')
 				call IMAP('\`'.nr2char(i), '\`'.nr2char(i), 'tex')
 				call IMAP('"`'.nr2char(i), '"`'.nr2char(i), 'tex')
 			endif
-			let i = i + 1
-		endwhile
+		endfor
 	endfunction 
 	call s:ProtectLetters(32, 127)
 	" }}}
@@ -187,18 +191,24 @@ function! Tex_Debug(str, ...)
 	else
 		let pattern = ''
 	endif
-	if !exists('s:debugString_'.pattern)
-		let s:debugString_{pattern} = ''
-	endif
-	let s:debugString_{pattern} = s:debugString_{pattern}.a:str."\n"
 
-	let s:debugString_ = (exists('s:debugString_') ? s:debugString_ : '')
-		\ . pattern.' : '.a:str."\n"
-
+	" If 'Tex_DebugLog' is given, write debug information into this file
+	" (preferred method).
+	" Otherwise, save it in a variable
 	if Tex_GetVarValue('Tex_DebugLog') != ''
 		exec 'redir! >> '.Tex_GetVarValue('Tex_DebugLog')
 		silent! echo pattern.' : '.a:str
 		redir END
+	else
+		if !exists('s:debugString_'.pattern)
+			let s:debugString_{pattern} = ''
+		endif
+		let s:debugString_{pattern} = s:debugString_{pattern}.a:str."\n"
+
+		if !exists('s:debugString_')
+			let s:debugString_ = ''
+		endif
+		let s:debugString_ = s:debugString_ . pattern.' : '.a:str."\n"
 	endif
 endfunction " }}}
 " Tex_PrintDebug: prings s:debugString {{{
@@ -248,61 +258,19 @@ endfunction
 " ==============================================================================
 " Helper functions for grepping
 " ============================================================================== 
-" Tex_Grep: shorthand for :grep or :vimgrep {{{
+" Tex_Grep: shorthand for :vimgrep {{{
 function! Tex_Grep(string, where)
-	if v:version >= 700
-		exec 'silent! vimgrep! /'.a:string.'/ '.a:where
-	else
-		exec 'silent! grep! '.Tex_EscapeForGrep(a:string).' '.a:where
-	endif
+	exec 'silent! vimgrep! /'.a:string.'/ '.a:where
 endfunction
 
 " }}}
-" Tex_Grepadd: shorthand for :grepadd or :vimgrepadd {{{
+" Tex_Grepadd: shorthand for :vimgrepadd {{{
 function! Tex_Grepadd(string, where)
-	if v:version >= 700
-		exec 'silent! vimgrepadd! /'.a:string.'/ '.a:where
-	else
-		exec "silent! grepadd! ".Tex_EscapeForGrep(a:string).' '.a:where
-	endif
+	exec 'silent! vimgrepadd! /'.a:string.'/ '.a:where
 endfunction
 
 " }}}
-" Tex_EscapeForGrep: escapes back-slashes and doublequotes the correct number of times {{{
-" Description: This command escapes the backslash and double quotes in a
-" 	search pattern the correct number of times so it can be used in the ``:grep``
-" 	command. This command is meant to be used as::
-"
-" 		exec "silent! grep ".Tex_EscapeForGrep(pattern)." file"
-"
-" 	The input argument to this function should be the string which you want
-" 	the external command to finally see. For example, to search for a string
-" 	``'\bibitem'``, the grep command needs to be passed a string like
-" 	``'\\bibitem'``.  Examples::
-"
-" 		Tex_EscapeForGrep('\\bibitem')        	" correct
-" 		Tex_EscapeForGrep('\bibitem')			" wrong
-" 		Tex_EscapeForGrep("\\bibitem")			" wrong
-" 		Tex_EscapeForGrep('\<word\>')			" correct
-"
-function! Tex_EscapeForGrep(string)
-	let retVal = a:string
 
-	" The shell halves the backslashes.
-	if &shell =~ 'sh'
-		let retVal = escape(retVal, "\\")
-
-		" If shellxquote is set, then the backslashes are halved yet again.
-		if &shellxquote == '"'
-			let retVal = escape(retVal, "\"\\")
-		endif
-
-	endif
-	" escape special characters which bash/cmd.exe might interpret
-	let retVal = escape(retVal, "<>")
-
-	return retVal
-endfunction " }}}
 
 " ==============================================================================
 " Uncategorized helper functions
@@ -311,6 +279,19 @@ endfunction " }}}
 " example: Strntok('1,23,3', ',', 2) = 23
 fun! Tex_Strntok(s, tok, n)
 	return matchstr( a:s.a:tok[0], '\v(\zs([^'.a:tok.']*)\ze['.a:tok.']){'.a:n.'}')
+endfun
+
+" }}}
+" Tex_CountMatches: count number of matches of pat in string {{{
+fun! Tex_CountMatches( string, pat )
+	let pos = 0
+	let cnt = 0
+	while pos >= 0
+		let pos = matchend(a:string, a:pat, pos)
+		let cnt = cnt + 1
+	endwhile
+	" We have counted one match to much
+	return cnt - 1
 endfun
 
 " }}}
@@ -329,9 +310,8 @@ endfun
 "
 " This string can be used in the input() function.
 function! Tex_CreatePrompt(promptList, cols, sep)
-
-	let g:listSep = a:sep
-	let num_common = GetListCount(a:promptList)
+	" There is one more item than matches of the seperator
+	let num_common = Tex_CountMatches( a:promptList, a:sep ) + 1
 
 	let i = 1
 	let promptStr = ""
@@ -458,41 +438,15 @@ endfunction
 function! Tex_ChooseFromPrompt(dialog, list, sep)
 	let g:Tex_ASDF = a:dialog
 	let inp = input(a:dialog)
+	" This is a workaround for a bug(?) in vim, see
+	" https://github.com/vim/vim/issues/778
+	redraw
 	if inp =~ '\d\+'
 		return Tex_Strntok(a:list, a:sep, inp)
 	else
 		return inp
 	endif
 endfunction " }}}
-" Tex_ChooseFile: produces a file list and prompts for choice {{{
-" Description: 
-function! Tex_ChooseFile(dialog)
-	let files = glob('*')
-	if files == ''
-		return ''
-	endif
-	let s:incnum = 0
-	echo a:dialog
-	let filenames = substitute(files, "\\v(^|\n)", "\\=submatch(0).Tex_IncrementNumber(1).' : '", 'g')
-	echo filenames
-	let choice = input('Enter Choice : ')
-	let g:choice = choice
-	if choice == ''
-		return ''
-	endif
-	if choice =~ '^\s*\d\+\s*$'
-		let retval = Tex_Strntok(files, "\n", choice)
-	else
-		let filescomma = substitute(files, "\n", ",", "g")
-		let retval = GetListMatchItem(filescomma, choice)
-	endif
-	if retval == ''
-		return ''
-	endif
-	return retval
-endfunction 
-
-" }}}
 " Tex_IncrementNumber: returns an incremented number each time {{{
 " Description: 
 let s:incnum = 0
@@ -507,10 +461,12 @@ endfunction
 function! Tex_ResetIncrementNumber(val)
 	let s:incnum = a:val
 endfunction " }}}
-" Tex_FindInRtp: check if file exists in &rtp {{{
-" Description:	Checks if file exists in globpath(&rtp, ...) and cuts off the
-" 				rest of returned names. This guarantees that sourced file is
-" 				from $HOME.
+" Tex_FindInDirectory: check if file exists in a directory {{{
+" Description:	Checks if file exists in globpath(directory, ...) and cuts off
+" 				the rest of returned names. This guarantees that sourced file
+" 				is from $HOME.
+"               If the argument a:rtp is set, we interpret a:directory as a
+"               subdirectory of &rtp/ftplugin/latex-suite/.
 "               If an optional argument is given, it specifies how to expand
 "               each filename found. For example, '%:p' will return a list of
 "               the complete paths to the files. By default returns trailing
@@ -520,20 +476,26 @@ endfunction " }}}
 "                     each filename found. Some speedup was acheived by using
 "                     a tokenizer approach rather than using Tex_Strntok which
 "                     would have been more obvious.
-function! Tex_FindInRtp(filename, directory, ...)
+function! Tex_FindInDirectory(filename, rtp, directory, ...)
 	" how to expand each filename. ':p:t:r' modifies each filename to its
 	" trailing part without extension.
 	let expand = (a:0 > 0 ? a:1 : ':p:t:r')
 	" The pattern used... An empty filename should be regarded as '*'
 	let pattern = (a:filename != '' ? a:filename : '*')
 
-	let filelist = globpath(&rtp, 'ftplugin/latex-suite/'.a:directory.'/'.pattern)."\n"
+	if a:rtp
+		let filelist = globpath(&rtp, 'ftplugin/latex-suite/'.a:directory.'/'.pattern)."\n"
+	else
+		let filelist = globpath(a:directory, pattern)."\n"
+	endif
 
 	if filelist == "\n"
 		return ''
 	endif
 
-	if a:filename != ''
+	if pattern !~ '\*'
+		" If we are not looking for a 'real' pattern, we return the first
+		" match.
 		return fnamemodify(Tex_Strntok(filelist, "\n", 1), expand)
 	endif
 
@@ -559,6 +521,13 @@ function! Tex_FindInRtp(filename, directory, ...)
 	endwhile
 
 	return substitute(retfilelist, ',$', '', '')
+endfunction
+
+" }}}
+" Tex_FindInRtp: check if file exists in &rtp {{{
+" Description:	Wrapper around Tex_FindInDirectory, using a:rtp
+function! Tex_FindInRtp(filename, directory, ...)
+	return call("Tex_FindInDirectory", [ a:filename, 1, a:directory ] + a:000 )
 endfunction
 
 " }}}
@@ -605,12 +574,7 @@ endfunction " }}}
 " Tex_CD: cds to given directory escaping spaces if necessary {{{
 " " Description: 
 function! Tex_CD(dirname)
-	exec 'cd '.Tex_EscapeSpaces(a:dirname)
-endfunction " }}}
-" Tex_EscapeSpaces: escapes unescaped spaces from a path name {{{
-" Description:
-function! Tex_EscapeSpaces(path)
-	return substitute(a:path, '[^\\]\(\\\\\)*\zs ', '\\ ', 'g')
+	exec 'cd '.fnameescape(a:dirname)
 endfunction " }}}
 " Tex_FindFile: finds a file in the vim's 'path' {{{
 " Description: finds a file in vim's 'path'
@@ -620,6 +584,10 @@ function! Tex_FindFile(fname, path, suffixesadd)
 		let &suffixesadd = a:suffixesadd
 		let retval = findfile(a:fname, a:path)
 		let &suffixesadd = _suffixesadd
+		if retval != ''
+			" Convert to full path and return
+			return fnamemodify(retval, ':p')
+		endif
 	else
 		" split a new window so we do not screw with the current buffer. We
 		" want to use the same filename each time so that multiple scratch
@@ -642,7 +610,9 @@ function! Tex_FindFile(fname, path, suffixesadd)
 endfunction " }}}
 " Tex_GetPos: gets position of cursor {{{
 function! Tex_GetPos()
-	if exists('*getpos')
+	if exists('*getcurpos')
+		return getcurpos()
+	elseif exists('*getpos')
 		return getpos('.')
 	else
 		return line('.').' | normal! '.virtcol('.').'|'
@@ -655,6 +625,148 @@ function! Tex_SetPos(pos)
 	else
 		exec a:pos
 	endif
+endfunction " }}}
+" s:RemoveLastHistoryItem: removes last search item from search history {{{
+" Description: Execute this string to clean up the search history.
+let s:RemoveLastHistoryItem = ':call histdel("/", -1)|let @/=g:Tex_LastSearchPattern'
+
+" }}}
+" VEnclose: encloses the visually selected region with given arguments {{{
+" Description: allows for differing action based on visual line wise
+"              selection or visual characterwise selection. preserves the
+"              marks and search history.
+function! VEnclose(vstart, vend, VStart, VEnd)
+	" it is characterwise if
+	" 1. characterwise selection and valid values for vstart and vend.
+	" OR
+	" 2. linewise selection and invalid values for VStart and VEnd
+	if (visualmode() ==# 'v' && (a:vstart != '' || a:vend != '')) || (a:VStart == '' && a:VEnd == '')
+
+		let newline = ""
+		let _r = @r
+
+		let normcmd = "normal! \<C-\>\<C-n>`<v`>\"_s"
+
+		exe "normal! \<C-\>\<C-n>`<v`>\"ry"
+		if @r =~ "\n$"
+			let newline = "\n"
+			let @r = substitute(@r, "\n$", '', '')
+		endif
+
+		" In exclusive selection, we need to select an extra character.
+		if &selection == 'exclusive'
+			let movement = 8
+		else
+			let movement = 7
+		endif
+		let normcmd = normcmd.
+			\ a:vstart."!!mark!!".a:vend.newline.
+			\ "\<C-\>\<C-N>?!!mark!!\<CR>v".movement."l\"_s\<C-r>r\<C-\>\<C-n>"
+
+		" this little if statement is because till very recently, vim used to
+		" report col("'>") > length of selected line when `> is $. on some
+		" systems it reports a -ve number.
+		if col("'>") < 0 || col("'>") > strlen(getline("'>"))
+			let lastcol = strlen(getline("'>"))
+		else
+			let lastcol = col("'>")
+		endif
+		if lastcol - col("'<") != 0
+			let len = lastcol - col("'<")
+		else
+			let len = ''
+		endif
+
+		" the next normal! is for restoring the marks.
+		let normcmd = normcmd."`<v".len."l\<C-\>\<C-N>"
+
+		" First remember what the search pattern was. s:RemoveLastHistoryItem
+		" will reset @/ to this pattern so we do not create new highlighting.
+		let g:Tex_LastSearchPattern = @/
+
+		silent! exe normcmd
+		" this is to restore the r register.
+		call setreg("r", _r, "c")
+		" and finally, this is to restore the search history.
+		execute s:RemoveLastHistoryItem
+
+	else
+
+		exec 'normal! `<O'.a:VStart."\<C-\>\<C-n>"
+		exec 'normal! `>o'.a:VEnd."\<C-\>\<C-n>"
+		if &indentexpr != ''
+			silent! normal! `<kV`>j=
+		endif
+		silent! normal! `>
+	endif
+endfunction
+
+" }}}
+" ExecMap: adds the ability to correct an normal/visual mode mapping.  {{{
+" Author: Hari Krishna Dara <hari_vim@yahoo.com>
+" Reads a normal mode mapping at the command line and executes it with the
+" given prefix. Press <BS> to correct and <Esc> to cancel.
+nnoremap <silent> <script> <plug><+SelectRegion+> `<v`>
+
+function! ExecMap(prefix, mode)
+	" Temporarily remove the mapping, otherwise it will interfere with the
+	" mapcheck call below:
+	let myMap = maparg(a:prefix, a:mode)
+	exec a:mode."unmap ".a:prefix
+
+	" Generate a line with spaces to clear the previous message.
+	let i = 1
+	let clearLine = "\r"
+	while i < &columns
+		let clearLine = clearLine . ' '
+		let i = i + 1
+	endwhile
+
+	let mapCmd = a:prefix
+	let foundMap = 0
+	let breakLoop = 0
+	echon "\rEnter Map: " . mapCmd
+	while !breakLoop
+		let char = getchar()
+		if char !~ '^\d\+$'
+			if char == "\<BS>"
+				let mapCmd = s:MultiByteWOLastCharacter(mapCmd)
+			endif
+		else " It is the ascii code.
+			let char = nr2char(char)
+			if char == "\<Esc>"
+				let breakLoop = 1
+			else
+				let mapCmd = mapCmd . char
+				if maparg(mapCmd, a:mode) != ""
+					let foundMap = 1
+					let breakLoop = 1
+				elseif mapcheck(mapCmd, a:mode) == ""
+					let mapCmd = s:MultiByteWOLastCharacter(mapCmd)
+				endif
+			endif
+		endif
+		echon clearLine
+		echon "\rEnter Map: " . mapCmd
+	endwhile
+	if foundMap
+		if a:mode == 'v'
+			" use a plug to select the region instead of using something like
+			" `<v`> to avoid problems caused by some of the characters in
+			" '`<v`>' being mapped.
+			let gotoc = "\<plug><+SelectRegion+>"
+		else
+			let gotoc = ''
+		endif
+		exec "normal ".gotoc.mapCmd
+	endif
+	exec a:mode.'noremap '.a:prefix.' '.myMap
+endfunction
+
+" }}}
+" s:MultiByteWOLastCharacter: Return string without last multibyte character {{{
+function! s:MultiByteWOLastCharacter(str)
+	return substitute(a:str, ".$", "", "")
 endfunction " }}}
 
 
@@ -805,6 +917,24 @@ if g:Tex_SmartKeyDot
 endif
 " }}}
 
+
+" Python detection: Tex_UsePython(), Tex_HasPython, Tex_Python[File]Cmd {{{
+if has('python3')
+	let g:Tex_HasPython = 3
+	let g:Tex_PythonCmd = 'python3'
+	let g:Tex_PythonFileCmd = 'py3file'
+elseif has('python')
+	let g:Tex_HasPython = 2
+	let g:Tex_PythonCmd = 'python'
+	let g:Tex_PythonFileCmd = 'pyfile'
+else
+	let g:Tex_HasPython = 0
+end
+function! Tex_UsePython()
+	return g:Tex_HasPython && Tex_GetVarValue('Tex_UsePython')
+endfunction
+" }}}
+
 " source texproject.vim before other files
 exe 'source '.fnameescape(s:path.'/texproject.vim')
 
@@ -828,10 +958,9 @@ exe 'source '.fnameescape(s:path.'/custommacros.vim')
 exe 'source '.fnameescape(s:path.'/bibtex.vim')
 
 " source advanced math functions
-if g:Tex_AdvancedMath == 1
-	exe 'source '.fnameescape(s:path.'/brackets.vim')
-	exe 'source '.fnameescape(s:path.'/smartspace.vim')
-endif
+exe 'source '.fnameescape(s:path.'/brackets.vim')
+
+exe 'source '.fnameescape(s:path.'/smartspace.vim')
 
 if g:Tex_Diacritics != 0
 	exe 'source '.fnameescape(s:path.'/diacritics.vim')
@@ -941,10 +1070,10 @@ function! Tex_GotoTempFile()
 	endif
 	exec 'silent! split '.s:tempFileName
 endfunction " }}}
-" Tex_IsPresentInFile: finds if a string str, is present in filename {{{
-if has('python') && g:Tex_UsePython
+" Tex_IsPresentInFile: finds if a regexp, is present in filename {{{
+if Tex_UsePython()
 	function! Tex_IsPresentInFile(regexp, filename)
-		exec 'python isPresentInFile(r"'.a:regexp.'", r"'.a:filename.'")'
+		exec g:Tex_PythonCmd . ' isPresentInFile(r"'.a:regexp.'", r"'.a:filename.'")'
 
 		return retval
 	endfunction
@@ -961,7 +1090,8 @@ else
 		let &report = _report
 		let &sc = _sc
 
-		if search(a:regexp, 'w')
+		" Use very magic to digest usual regular expressions.
+		if search('\v' . a:regexp, 'w')
 			let retval = 1
 		else
 			let retval = 0
@@ -978,10 +1108,10 @@ if exists('*readfile')
 		endif
 		return join(readfile(a:filename), "\n")
 	endfunction
-elseif has('python') && g:Tex_UsePython
+elseif Tex_UsePython()
 	function! Tex_CatFile(filename)
 		" catFile assigns a value to retval
-		exec 'python catFile("'.a:filename.'")'
+		exec g:Tex_PythonCmd . ' catFile("'.a:filename.'")'
 
 		return retval
 	endfunction
@@ -1015,9 +1145,9 @@ endif
 " }}}
 " Tex_DeleteFile: removes a file if present {{{
 " Description: 
-if has('python') && g:Tex_UsePython
+if Tex_UsePython()
 	function! Tex_DeleteFile(filename)
-		exec 'python deleteFile(r"'.a:filename.'")'
+		exec g:Tex_PythonCmd . ' deleteFile(r"'.a:filename.'")'
 		
 		if exists('retval')
 			return retval
@@ -1036,10 +1166,8 @@ endif
 let &cpo = s:save_cpo
 
 " Define the functions in python if available.
-if !has('python') || !g:Tex_UsePython
-	finish
+if Tex_UsePython()
+	exec g:Tex_PythonFileCmd . ' ' . fnameescape(expand('<sfile>:p:h')).'/pytools.py'
 endif
-
-exec 'pyfile '.fnameescape(expand('<sfile>:p:h')).'/pytools.py'
 
 " vim:fdm=marker:ff=unix:noet:ts=4:sw=4:nowrap

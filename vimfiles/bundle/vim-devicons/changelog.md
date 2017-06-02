@@ -3,6 +3,49 @@ CHANGELOG
 ================================================================================
 This project is using [Semantic Versioning 2.0.0](http://semver.org/)
 
+- v0.9.2
+  - Added `yaml` filetype (PR #207) (@jpoppe)
+  - Added mention of `vim-workspace` as an integrated plugin (PR #206) (@bagrat)
+  - Fixed NERDTree keymap `U` open folder icon bug (fixes #189)
+- v0.9.1
+  - Added `sass` filetype (PR #202) (@toastal)
+  - Fixed NERDTree open/close folder icon bugs (fixes #194)
+  - Fixed airline conflict with file enconding `skip_expected_string` feature (fixes #203)
+  - Fixed possible glyph artifacts on open/close folder glyphs
+- v0.9.0
+  - Added support for [Denite](https://github.com/Shougo/denite.nvim) (PR #191) (@0phoff)
+  - Added symbol for byte order marker (BOM) (utf-8) (PR #199) (@Snaptags)
+  - Added support for `.zshrc`, `.vimrc`, `pp` (Puppet classes extensions), and `Vagrantfile` filetypes (enhancement #200) (@kiyanwang)
+  - Added support for `h`, `hpp`, `hxx` (C/C++ header filetype extensions) (enhancement #190)
+  - Added support for `bash`, `zsh`, `ksh`, `csh`, `awk`, `ps1` (script extensions) (enhancement #196)
+  - Added support for `rmd` (R Markdown) (partially fixes #195)
+  - Fixes opened folders titles padding/spacing offset (fixes #197)
+- v0.8.6
+  - Added support for vimfiler explorer mode (fixes #171)
+  - Added `doc/tags` to `.gitignore` (PR #182) (@doronbehar)
+  - Added warning to readme pertaining to old versions of NERDTree and CtrlP (PR #177, fixes #174) (@Melon-Bread)
+  - Fixes CtrlP buffer names (PR #185) (@HerringtonDarkholme)
+  - Fixes character encoding issue in vim doc (PR #178) (@mhartington)
+  - Fixes extraneous space after glyph in airline (PR #184) (@tbodt)
+  - Fixes errors when NERDTree not present (PR #187) (@blueyed)
+  - Updated Contributor Covenant to `v1.4`
+  - Updated API examples
+- v0.8.5
+  - Fixed errors in neovim (E670) (PR #163, fixes #162) (@mhartington)
+  - Fixed issue of updating NERDTree window via `CursorHoldUpdate` (PR #166) (@svanharmelen)
+    - Fixes updating of special buffer when selected
+    - Fixes potential issues CtrlP opening in wrong buffer when NERDTree is opened
+  - Fixed issue with CtrlP `:CtrlPMRU` always defaulting to current buffer (fixes #88)
+    - Also adds glyphs to other CtrlP modes besides MRU as a side effect
+  - Fixed documentation discrepency on pluging load order (PR #169) (@F1LT3R)
+  - Fixed documentation related to CtrlP MRU mode (PR #170, fixes #168) (@F1LT3R)
+- v0.8.4
+  - Fixed always warning about deprecated CtrlP version (fixes #137)
+  - Fixed missing configuration info about pattern based symbols (fixes #152)
+  - Fixed `WebDevIconsGetFileTypeSymbol` method iterator missing `break` (PR #156) (@blueyed)
+  - Fixed a typo in the readme (PR #159) (@SSARCandy)
+  - Added reference to [tiagofumo/vim-nerdtree-syntax-highlight](https://github.com/tiagofumo/vim-nerdtree-syntax-highlight) in readme (PR #161) (@tiagofumo)
+    - However, the [FAQ](https://github.com/ryanoasis/vim-devicons/wiki/FAQ) has been moved to the [Wiki](https://github.com/ryanoasis/vim-devicons/wiki) in this release
 - v0.8.3
   - Fixed NERDTree not displaying glyph (icon) for newly created files (fixes #153)
     - Also adds info to readme about `updatetime`

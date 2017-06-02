@@ -5,20 +5,20 @@ This is a new version from JumpInCode.vim I don't know why i can't upload a new 
 ctags and cscope plugin for vim, more convenice way to use ctags and cscope in vim
 
 Command:
-\gs   Generate tags and cscope database from current directory
-\cs   Configure window (Take care of the help info the window below)
+\sy   Generate tags and cscope database from current directory
+\sc   Configure window (Take care of the help info the window below)
 
 Sample_1:
     :e your_source_.h
     :cd %:p:h
-    \gs
+    \sy
     <Enter>
     :EnQuickSnippet
     :CscopeCtagsMenu
 
 Sample_2:
     :cd d:\
-    \cs
+    \sc
     <Select your database and input enter>
     :EnQuickSnippet
     :CscopeCtagsMenu
@@ -26,7 +26,7 @@ Sample_2:
 
 Suggestion:
     1. <Leader>sy is default script command, if it conflict with your other script you can change it at line 753 of script.
-    2. <Leader>sc is default script command, if it conflict with your other script you can change it at line 754 of script.
+    2. <Leader>sy is default script command, if it conflict with your other script you can change it at line 754 of script.
     3. Command CscopeCtagsMenu, EnQuickSnippet, DiQuickSnippet are not mapped, for convenient way is map it to your own command in your .vimrc or _vimrc file.
     4. If your are using gvim on window, CscopeCtagsMenu is pretty help to view source code.
     5. This script is better work with script: taglist ( http://www.vim.org/scripts/script.php?script_id=273 )

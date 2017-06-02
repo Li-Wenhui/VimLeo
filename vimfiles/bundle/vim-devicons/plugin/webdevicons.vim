@@ -1,9 +1,11 @@
-" Version: 0.8.3
+" Version: 0.9.2
 " Webpage: https://github.com/ryanoasis/vim-devicons
 " Maintainer: Ryan McIntyre <ryanoasis@gmail.com>
 " License: see LICENSE
 
-let s:version = '0.8.3'
+let s:version = '0.9.2'
+let s:plugin_home = expand('<sfile>:p:h:h')
+
 " set scriptencoding after 'encoding' and when using multibyte chars
 scriptencoding utf-8
 
@@ -34,6 +36,10 @@ endif
 
 if !exists('g:webdevicons_enable_unite')
   let g:webdevicons_enable_unite = 1
+endif
+
+if !exists('g:webdevicons_enable_denite')
+  let g:webdevicons_enable_denite = 1
 endif
 
 if !exists('g:webdevicons_enable_vimfiler')
@@ -123,6 +129,10 @@ if !exists('g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol')
   let g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol = ''
 endif
 
+if !exists('g:WebDevIconsUnicodeByteOrderMarkerDefaultSymbol')
+  let g:WebDevIconsUnicodeByteOrderMarkerDefaultSymbol = ''
+endif
+
 if !exists('g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol')
   if g:DevIconsEnableFoldersOpenClose
     " use new glyph
@@ -183,6 +193,7 @@ function! s:setDictionaries()
 
   let s:file_node_extensions = {
         \ 'styl'     : '',
+        \ 'sass'     : '',
         \ 'scss'     : '',
         \ 'htm'      : '',
         \ 'html'     : '',
@@ -192,6 +203,7 @@ function! s:setDictionaries()
         \ 'less'     : '',
         \ 'md'       : '',
         \ 'markdown' : '',
+        \ 'rmd'      : '',
         \ 'json'     : '',
         \ 'js'       : '',
         \ 'jsx'      : '',
@@ -207,6 +219,7 @@ function! s:setDictionaries()
         \ 'conf'     : '',
         \ 'ini'      : '',
         \ 'yml'      : '',
+        \ 'yaml'     : '',
         \ 'bat'      : '',
         \ 'jpg'      : '',
         \ 'jpeg'     : '',
@@ -221,12 +234,21 @@ function! s:setDictionaries()
         \ 'cc'       : '',
         \ 'cp'       : '',
         \ 'c'        : '',
+        \ 'h'        : '',
+        \ 'hpp'      : '',
+        \ 'hxx'      : '',
         \ 'hs'       : '',
         \ 'lhs'      : '',
         \ 'lua'      : '',
         \ 'java'     : '',
         \ 'sh'       : '',
         \ 'fish'     : '',
+        \ 'bash'     : '',
+        \ 'zsh'      : '',
+        \ 'ksh'      : '',
+        \ 'csh'      : '',
+        \ 'awk'      : '',
+        \ 'ps1'      : '',
         \ 'ml'       : 'λ',
         \ 'mli'      : 'λ',
         \ 'diff'     : '',
@@ -262,7 +284,8 @@ function! s:setDictionaries()
         \ 'psd'      : '',
         \ 'psb'      : '',
         \ 'ts'       : '',
-        \ 'jl'       : ''
+        \ 'jl'       : '',
+        \ 'pp'       : ''
         \}
 
   let s:file_node_exact_matches = {
@@ -279,6 +302,8 @@ function! s:setDictionaries()
         \ '.gitconfig'                       : '',
         \ '.gitignore'                       : '',
         \ '.bashrc'                          : '',
+        \ '.zshrc'                           : '',
+        \ '.vimrc'                           : '',
         \ '.bashprofile'                     : '',
         \ 'favicon.ico'                      : '',
         \ 'license'                          : '',
@@ -294,7 +319,8 @@ function! s:setDictionaries()
         \ '.*require.*\.js$'      : '',
         \ '.*materialize.*\.js$'  : '',
         \ '.*materialize.*\.css$' : '',
-        \ '.*mootools.*\.js$'     : ''
+        \ '.*mootools.*\.js$'     : '',
+        \ 'Vagrantfile$'          : ''
         \}
 
   if !exists('g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols')
@@ -363,16 +389,25 @@ function! s:CursorHoldUpdate()
     return
   endif
 
-  if !g:NERDTree.IsOpen()
+  if !exists('g:NERDTree') || !g:NERDTree.IsOpen()
+    return
+  endif
+
+  " Do not update when a special buffer is selected
+  if !empty(&l:buftype)
     return
   endif
 
   " winnr need to make focus go to opened file
   " CursorToTreeWin needed to avoid error on opening file
   let l:winnr = winnr()
+  let l:altwinnr = winnr('#')
+
   call g:NERDTree.CursorToTreeWin()
   call b:NERDTree.root.refreshFlags()
   call NERDTreeRender()
+
+  exec l.altwinnr . 'wincmd w'
   exec l:winnr . 'wincmd w'
 endfunction
 
@@ -419,7 +454,7 @@ endfunction
 function! s:initializeUnite()
   if exists('g:loaded_unite') && g:webdevicons_enable_unite
     let s:filters = {
-          \   'name' : 'devicons_converter',
+          \   'name' : 'devicons_unite_converter',
           \}
 
     function! s:filters.filter(candidates, context)
@@ -450,7 +485,17 @@ function! s:initializeUnite()
     call unite#define_filter(s:filters)
     unlet s:filters
 
-    call unite#custom#source('file,file_rec,buffer,file_rec/async,file_rec/neovim,file_rec/neovim2,file_rec/git', 'converters', 'devicons_converter')
+    call unite#custom#source('file,file_rec,buffer,file_rec/async,file_rec/neovim,file_rec/neovim2,file_rec/git', 'converters', 'devicons_unite_converter')
+  endif
+endfunction
+
+" for denite plugin {{{3
+"========================================================================
+
+" scope: local
+function! s:initializeDenite()
+  if exists('g:loaded_denite') && g:webdevicons_enable_denite
+    call denite#custom#source('file_rec,file_old,buffer,directory_rec', 'converters', ['devicons_denite_converter'])
   endif
 endfunction
 
@@ -461,7 +506,8 @@ endfunction
 function! s:initializeVimfiler()
   if exists('g:loaded_vimfiler') && g:webdevicons_enable_vimfiler
     call vimfiler#custom#profile('default', 'context', {
-      \ 'columns' : 'type:devicons:size:time'
+      \ 'columns' : 'devicons:size:time',
+      \ 'explorer_columns': 'devicons'
       \ })
   endif
 endfunction
@@ -474,23 +520,32 @@ endfunction
 " Support for kien/ctrlp.vim deprecated since v0.7.0
 " @TODO implementation for CtrlP buffer and find file mode
 function! s:initializeCtrlP()
-  if exists('g:loaded_ctrlp') && g:webdevicons_enable_ctrlp
-    let s:glyphASCIIRangeStart = 57344
-    let s:glyphASCIIRangeEnd = 63743
-    let g:ctrlp_open_func = {
-      \ 'mru files': 'webdevicons#ctrlPOpenFunc'
-      \ }
+  let l:ctrlp_warning_message = 'vim-devicons: https://github.com/kien/ctrlp.vim is deprecated since v0.7.0, please use https://github.com/ctrlpvim/ctrlp.vim'
+  let l:ctrlp_warned_file = s:plugin_home . '/status_warned_ctrlp'
 
-    if exists('g:ctrlp_mruf_map_string')
-      " logic for ctrlpvim/ctrlp.vim:
-      let g:ctrlp_mruf_map_string = '!stridx(v:val, cwd) ? WebDevIconsGetFileTypeSymbol(strpart(v:val, strridx(v:val, "/"))) . " " . strpart(v:val, idx) : g:WebDevIconsUnicodeDecorateFileNodesDefaultSymbol . " " . v:val'
-    else
+  if exists('g:loaded_ctrlp') && g:webdevicons_enable_ctrlp
+    let l:forkedCtrlp = exists('g:ctrlp_mruf_map_string')
+
+    if l:forkedCtrlp
+      if !exists('g:ctrlp_formatline_func')
+        " logic for ctrlpvim/ctrlp.vim:
+        let g:ctrlp_formatline_func = 's:formatline(s:curtype() == "buf" ? v:val : WebDevIconsGetFileTypeSymbol(v:val) . " " . v:val) '
+      endif
+    elseif empty(glob(l:ctrlp_warned_file))
       " logic for kien/ctrlp.vim:
       echohl WarningMsg |
-        \ echomsg 'vim-devicons: https://github.com/kien/ctrlp.vim is deprecated since v0.7.0, please use https://github.com/ctrlpvim/ctrlp.vim'
+        \ echomsg l:ctrlp_warning_message
+      " only warn first time, do not warn again:
+      try
+        execute writefile(['File automatically generated after warning about CtrlP once', l:ctrlp_warning_message], l:ctrlp_warned_file)
+      catch
+      endtry
     endif
   endif
 endfunction
+
+" local initialization {{{2
+"========================================================================
 
 " scope: local
 function! s:initialize()
@@ -499,13 +554,12 @@ function! s:initialize()
   call s:setCursorHold()
   call s:initializeFlagship()
   call s:initializeUnite()
+  call s:initializeDenite()
   call s:initializeVimfiler()
   call s:initializeCtrlP()
 endfunction
 
-" local initialization {{{2
-"========================================================================
-
+" had some issues with VimEnter, for now using:
 call s:initialize()
 
 " public functions {{{2
@@ -534,24 +588,10 @@ function! webdevicons#softRefresh()
   call s:softRefreshNerdTree()
 endfunction
 
-" scope: public
-function! webdevicons#ctrlPOpenFunc(action, line)
-  let line = a:line
-  " Remove non-breaking space which is present (NBSP U+00A0)
-  let line = substitute(line, ' ', '', '')
-  " Trim leading and trailing whitespace and replace private character range characters
-  let glyphASCIICandidate = char2nr(strpart(line, 0, 3))
-
-  if glyphASCIICandidate >= s:glyphASCIIRangeStart && glyphASCIICandidate <= s:glyphASCIIRangeEnd
-    let line = s:strip(strpart(line, 3))
-  endif
-  " Use CtrlP's default file opening function
-  call call('ctrlp#acceptfile', [a:action, line])
-endfunction
-
-" a:1 (bufferName), a:2 (isDirectory)
+" a:1 (bufferName), a:2 (isDirectory), a:3 (appendArtifactFix)
 " scope: public
 function! WebDevIconsGetFileTypeSymbol(...)
+  let appendArtifactFix = 1
   if a:0 == 0
     let fileNodeExtension = expand('%:e')
     let fileNode = expand('%:t')
@@ -559,10 +599,14 @@ function! WebDevIconsGetFileTypeSymbol(...)
   else
     let fileNodeExtension = fnamemodify(a:1, ':e')
     let fileNode = fnamemodify(a:1, ':t')
-    if a:0 == 2
+    if a:0 > 1
       let isDirectory = a:2
     else
       let isDirectory = 0
+    endif
+
+    if a:0 == 3
+      let appendArtifactFix = a:3
     endif
   endif
 
@@ -575,6 +619,7 @@ function! WebDevIconsGetFileTypeSymbol(...)
     for [pattern, glyph] in items(g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols)
       if match(fileNode, pattern) != -1
         let symbol = glyph
+        break
       endif
     endfor
 
@@ -594,7 +639,11 @@ function! WebDevIconsGetFileTypeSymbol(...)
 
   " Temporary (hopefully) fix for glyph issues in gvim (proper fix is with the
   " actual font patcher)
-  let artifactFix = "\u00A0"
+  if appendArtifactFix == 1
+    let artifactFix = "\u00A0"
+  else
+    let artifactFix = ""
+  endif
 
   return symbol . artifactFix
 
@@ -603,6 +652,11 @@ endfunction
 " scope: public
 function! WebDevIconsGetFileFormatSymbol(...)
   let fileformat = ''
+  let bomb = ''
+
+  if (&bomb && g:WebDevIconsUnicodeByteOrderMarkerDefaultSymbol !=? '')
+    let bomb = g:WebDevIconsUnicodeByteOrderMarkerDefaultSymbol . ' '
+  endif
 
   if &fileformat ==? 'dos'
     let fileformat = ''
@@ -620,7 +674,7 @@ function! WebDevIconsGetFileFormatSymbol(...)
   " actual font patcher)
   let artifactFix = "\u00A0"
 
-  return fileformat . artifactFix
+  return bomb . fileformat . artifactFix
 endfunction
 
 " for airline plugin {{{3
@@ -630,7 +684,8 @@ endfunction
 function! AirlineWebDevIcons(...)
   let w:airline_section_x = get(w:, 'airline_section_x', g:airline_section_x)
   let w:airline_section_x .= ' %{WebDevIconsGetFileTypeSymbol()} '
-  if g:webdevicons_enable_airline_statusline_fileformat_symbols
+  let hasFileFormatEncodingPart = airline#parts#ffenc() != ''
+  if g:webdevicons_enable_airline_statusline_fileformat_symbols && hasFileFormatEncodingPart
     let w:airline_section_y = ' %{&fenc . " " . WebDevIconsGetFileFormatSymbol()} '
   endif
 endfunction
@@ -676,12 +731,12 @@ function! NERDTreeWebDevIconsRefreshListener(event)
   if !path.isDirectory
     let flag = prePadding . WebDevIconsGetFileTypeSymbol(path.str()) . padding
   elseif path.isDirectory && g:WebDevIconsUnicodeDecorateFolderNodes == 1
-
     let directoryOpened = 0
 
     if g:DevIconsEnableFoldersOpenClose && len(path.flagSet._flagsForScope('webdevicons')) > 0
-      " isOpen is not available on the path listener, compare using symbols
-      if path.flagSet._flagsForScope('webdevicons')[0] == prePadding . g:DevIconsDefaultFolderOpenSymbol . padding
+      " isOpen is not available on the path listener directly
+      " but we added one via overriding particular keymappings for NERDTree
+      if has_key(path, 'isOpen') && path.isOpen == 1
         let directoryOpened = 1
       endif
     endif
@@ -690,13 +745,13 @@ function! NERDTreeWebDevIconsRefreshListener(event)
       if g:DevIconsEnableFoldersOpenClose && directoryOpened
         let flag = prePadding . g:DevIconsDefaultFolderOpenSymbol . padding
       else
-        let flag = prePadding . WebDevIconsGetFileTypeSymbol(path.str(), path.isDirectory) . padding
+        let flag = prePadding . WebDevIconsGetFileTypeSymbol(path.str(), path.isDirectory, 0) . padding
       endif
     else
       if g:DevIconsEnableFoldersOpenClose && directoryOpened
         let flag = prePadding . g:DevIconsDefaultFolderOpenSymbol . padding
       else
-        let flag = prePadding . g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol
+        let flag = prePadding . g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol . padding
       endif
     endif
   else

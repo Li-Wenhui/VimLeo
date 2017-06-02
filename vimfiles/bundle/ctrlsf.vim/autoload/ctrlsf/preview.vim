@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 " preview buffer's name
@@ -20,18 +20,29 @@ func! ctrlsf#preview#OpenPreviewWindow() abort
     " be sure doing this only when *opening new window*
     call ctrlsf#win#BackupAllWinSize()
 
-    if g:ctrlsf_position == "left" || g:ctrlsf_position == "right"
-        let ctrlsf_width  = winwidth(0)
-        let winsize = min([&columns-ctrlsf_width, ctrlsf_width])
+    let vmode = ctrlsf#CurrentMode()
+
+    if vmode ==# 'normal'
+        " normal mode
+        if g:ctrlsf_position == "left" || g:ctrlsf_position == "right"
+            let ctrlsf_width  = winwidth(0)
+            let winsize = min([&columns-ctrlsf_width, ctrlsf_width])
+        else
+            let ctrlsf_height  = winheight(0)
+            let winsize = min([&lines-ctrlsf_height, ctrlsf_height])
+        endif
+
+        let openpos = {
+                \ 'bottom': 'leftabove',  'right' : 'leftabove vertical',
+                \ 'top'   : 'rightbelow',  'left' : 'rightbelow vertical'}
+                \[g:ctrlsf_position] . ' '
     else
-        let ctrlsf_height  = winheight(0)
-        let winsize = min([&lines-ctrlsf_height, ctrlsf_height])
+        " compact mode
+        let winsize = &lines - 20
+        let openpos = 'leftabove'
     endif
 
-    let openpos = {
-            \ 'bottom': 'leftabove',  'right' : 'leftabove vertical',
-            \ 'top'   : 'rightbelow',  'left' : 'rightbelow vertical'}
-            \[g:ctrlsf_position] . ' '
+    " open window
     exec 'silent keepalt ' . openpos . winsize . 'split ' . '__CtrlSFPreview__'
 
     call s:InitPreviewWindow()

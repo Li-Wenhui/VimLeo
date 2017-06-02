@@ -1,8 +1,8 @@
 " ============================================================================
-" Description: An ack/ag/pt powered code search and view tool.
+" Description: An ack/ag/pt/rg powered code search and view tool.
 " Author: Ye Ding <dygvirus@gmail.com>
 " Licence: Vim licence
-" Version: 1.7.2
+" Version: 1.9.0
 " ============================================================================
 
 func! s:Summary(resultset) abort
@@ -27,6 +27,15 @@ func! s:Line(line) abort
     return [out]
 endf
 
+func! s:MatchLine(match) abort
+    let out = printf("%s|%s col %s| %s",
+                \ a:match.filename,
+                \ a:match.lnum,
+                \ a:match.col,
+                \ a:match.text)
+    return [out]
+endf
+
 func! ctrlsf#view#Indent() abort
     let maxlnum = ctrlsf#db#MaxLnum()
     return strlen(string(maxlnum)) + 1 + g:ctrlsf_indent
@@ -36,7 +45,18 @@ endf
 "
 " Return rendered view of current resultset.
 "
+" Returns:
+" Text of rendered view
+"
 func! ctrlsf#view#Render() abort
+    if ctrlsf#CurrentMode() ==# 'normal'
+        return s:NormalView()
+    else
+        return s:CompactView()
+    endif
+endf
+
+func! s:NormalView() abort
     let resultset = ctrlsf#db#ResultSet()
     let cur_file = ''
 
@@ -68,25 +88,56 @@ func! ctrlsf#view#Render() abort
     return join(view, "\n")
 endf
 
-" Reflect()
+func! s:CompactView() abort
+    let matchlist = ctrlsf#db#MatchList()
+
+    let view = []
+
+    for mat in matchlist
+        call extend(view, s:MatchLine(mat))
+    endfo
+
+    return join(view, "\n")
+endf
+
+" Locate()
 "
 " Find resultset which is corresponding the given line.
 "
-" Parameters
+" Parameters:
 " {vlnum} number of a line within rendered view
 "
-" Returns
+" Returns:
 " [file, line, match] if corresponding line contains one or more matches
 " [file, line, {}]    if corresponding line doesn't contains any match
 " ['', {}, {}]        if no corresponding line is found
 "
-func! ctrlsf#view#Reflect(vlnum) abort
+func! ctrlsf#view#Locate(vlnum) abort
+    if ctrlsf#CurrentMode() ==# 'normal'
+        return s:LocateNormalView(a:vlnum)
+    else
+        return s:LocateCompactView(a:vlnum)
+    endif
+endf
+
+" s:LocateCompactView()
+"
+func! s:LocateCompactView(vlnum) abort
+    let matchlist = ctrlsf#db#MatchList()
+    let match = get(matchlist, a:vlnum-1, {})
+    if !empty(match)
+        let line = ctrlsf#class#line#New(match.filename, match.lnum, match.text)
+        return [match.filename, line, match]
+    else
+        return ['', {}, {}]
+    endif
+endf
+
+" s:LocateNormalView()
+"
+func! s:LocateNormalView(vlnum) abort
     let resultset = ctrlsf#db#ResultSet()
-
-    let ret = s:BSearch(resultset, 0, len(resultset) - 1, a:vlnum)
-    call ctrlsf#log#Debug("Reflect: vlnum: %s, result: %s", a:vlnum, string(ret))
-
-    return ret
+    return s:BSearch(resultset, 0, len(resultset) - 1, a:vlnum)
 endf
 
 func! s:BSearch(resultset, left, right, vlnum) abort
@@ -128,24 +179,25 @@ endf
 
 " FindNextMatch()
 "
-" Find next match. Wrapping around or not depends on value of 'wrapscan'.
+" Find next match.
 "
-" Parameters
-" {vlnum}   the line number of search base
+" Parameters:
 " {forward} true or false
+" {wrapscan} true or false
 "
-" Returns
+" Returns:
 " [vlnum, vcol] line number and column number of next match
 "
-func! ctrlsf#view#FindNextMatch(vlnum, forward) abort
-    let regex = ctrlsf#pat#MatchPerLineRegex()
+func! ctrlsf#view#FindNextMatch(forward, wrapscan) abort
+    let regex = ctrlsf#pat#MatchPerLineRegex(ctrlsf#CurrentMode())
     let flag  = a:forward ? 'n' : 'nb'
+    let flag .= a:wrapscan ? 'w' : 'W'
     return searchpos(regex, flag)
 endf
 
 " Derender()
 "
-" Return a ResultSet which is derendered from {content}.
+" Return a 'ResultSet' which is derendered from {content}.
 "
 func! ctrlsf#view#Derender(content) abort
     let lines  = type(a:content) == 3 ? a:content : split(a:content, "\n")

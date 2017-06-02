@@ -1,4 +1,4 @@
-" Version: 0.8.3
+" Version: 0.9.2
 " Webpage: https://github.com/ryanoasis/vim-devicons
 " Maintainer: Ryan McIntyre <ryanoasis@gmail.com>
 " License: see LICENSE
@@ -69,6 +69,13 @@ function! s:SetupListeners()
   call g:NERDTreePathNotifier.AddListener('refreshFlags', 'NERDTreeWebDevIconsRefreshListener')
 endfunction
 
+" util like helpers
+" scope: local
+function! s:Refresh()
+  call b:NERDTree.root.refreshFlags()
+  call NERDTreeRender()
+endfunction
+
 " Temporary (hopefully) fix for glyph issues in gvim (proper fix is with the
 " actual font patcher)
 
@@ -88,10 +95,7 @@ function! WebDevIconsNERDTreeUpDirCurrentRootClosedHandler()
   redraw!
 endfunction
 
-" NERDTreeMapActivateNode and <2-LeftMouse>
-" handle the user activating a tree node
-" scope: global
-function! WebDevIconsNERDTreeMapActivateNode(node)
+function! WebDevIconsNERDTreeDirUpdateFlags(node, glyph)
   let path = a:node.path
   let isOpen = a:node.isOpen
   let padding = g:WebDevIconsNerdTreeAfterGlyphPadding
@@ -112,12 +116,7 @@ function! WebDevIconsNERDTreeMapActivateNode(node)
     let prePadding .= '  '
   endif
 
-  " toggle flag
-  if isOpen
-    let flag = prePadding . g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol . padding
-  else
-    let flag = prePadding . g:DevIconsDefaultFolderOpenSymbol . padding
-  endif
+  let flag = prePadding . a:glyph . padding
 
   call a:node.path.flagSet.clearFlags('webdevicons')
 
@@ -125,15 +124,134 @@ function! WebDevIconsNERDTreeMapActivateNode(node)
     call a:node.path.flagSet.addFlag('webdevicons', flag)
     call a:node.path.refreshFlags(b:NERDTree)
   endif
+endfunction
 
+function! WebDevIconsNERDTreeDirClose(node)
+  let a:node.path.isOpen = 0
+  let glyph = g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol
+  call WebDevIconsNERDTreeDirUpdateFlags(a:node, glyph)
+endfunction
+
+function! WebDevIconsNERDTreeDirOpen(node)
+  let a:node.path.isOpen = 1
+  let glyph = g:DevIconsDefaultFolderOpenSymbol
+  call WebDevIconsNERDTreeDirUpdateFlags(a:node, glyph)
+endfunction
+
+function! WebDevIconsNERDTreeDirOpenRecursively(node)
+  call WebDevIconsNERDTreeDirOpen(a:node)
+  for i in a:node.children
+    if i.path.isDirectory ==# 1
+      call WebDevIconsNERDTreeDirOpenRecursively(i)
+    endif
+  endfor
+endfunction
+
+function! WebDevIconsNERDTreeDirCloseRecursively(node)
+  call WebDevIconsNERDTreeDirClose(a:node)
+  for i in a:node.children
+    if i.path.isDirectory ==# 1
+      call WebDevIconsNERDTreeDirCloseRecursively(i)
+    endif
+  endfor
+endfunction
+
+function! WebDevIconsNERDTreeDirCloseChildren(node)
+  for i in a:node.children
+    if i.path.isDirectory ==# 1
+      call WebDevIconsNERDTreeDirClose(i)
+    endif
+  endfor
+endfunction
+
+" NERDTreeMapActivateNode and <2-LeftMouse>
+" handle the user activating a tree node
+" scope: global
+function! WebDevIconsNERDTreeMapActivateNode(node)
+  let isOpen = a:node.isOpen
+  if isOpen
+    let glyph = g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol
+  else
+    let glyph = g:DevIconsDefaultFolderOpenSymbol
+  endif
+  let a:node.path.isOpen = !isOpen
+  call WebDevIconsNERDTreeDirUpdateFlags(a:node, glyph)
   " continue with normal activate logic
   call a:node.activate()
+  " glyph change possible artifact clean-up
+  redraw!
+endfunction
+
+function! WebDevIconsNERDTreeMapOpenRecursively(node)
+  " normal original logic:
+  call nerdtree#echo("Recursively opening node. Please wait...")
+  call a:node.openRecursively()
+  call WebDevIconsNERDTreeDirOpenRecursively(a:node)
+  " continue with normal original logic:
+  call b:NERDTree.render()
+  " glyph change possible artifact clean-up
+  redraw!
+  call nerdtree#echo("Recursively opening node. Please wait... DONE")
+endfunction
+
+function! WebDevIconsNERDTreeMapCloseChildren(node)
+  " close children but not current node:
+  call WebDevIconsNERDTreeDirCloseChildren(a:node)
+  " continue with normal original logic:
+  call a:node.closeChildren()
+  call b:NERDTree.render()
+  call a:node.putCursorHere(0, 0)
+  " glyph change possible artifact clean-up
+  redraw!
+endfunction
+
+function! WebDevIconsNERDTreeMapCloseDir(node)
+  " continue with normal original logic:
+  let parent = a:node.parent
+  while g:NERDTreeCascadeOpenSingleChildDir && !parent.isRoot()
+    let childNodes = parent.getVisibleChildren()
+    if len(childNodes) == 1 && childNodes[0].path.isDirectory
+      let parent = parent.parent
+    else
+      break
+    endif
+  endwhile
+  if parent ==# {} || parent.isRoot()
+    call nerdtree#echo("cannot close tree root")
+  else
+    call parent.close()
+    " update the glyph
+    call WebDevIconsNERDTreeDirClose(parent)
+    call b:NERDTree.render()
+    call parent.putCursorHere(0, 0)
+    " glyph change possible artifact clean-up
+    redraw!
+  endif
+endfunction
+
+function! WebDevIconsNERDTreeMapUpdirKeepOpen()
+  call WebDevIconsNERDTreeDirOpen(b:NERDTree.root)
+  " continue with normal logic:
+  call nerdtree#ui_glue#upDir(1)
+  call s:Refresh()
+  " glyph change possible artifact clean-up
+  redraw!
 endfunction
 
 if g:webdevicons_enable == 1 && g:webdevicons_enable_nerdtree == 1
   call s:SetupListeners()
 
   if g:DevIconsEnableFoldersOpenClose
+
+    " These overrides are needed because we cannot
+    " simply use AddListener for reliably updating
+    " the folder open/close glyphs because the event
+    " path has no access to the 'isOpen' property
+    " some of these are a little more brittle/fragile
+    " than others
+    " TODO FIXME better way to reliably update
+    " open/close glyphs in NERDTreeWebDevIconsRefreshListener
+
     " NERDTreeMapActivateNode
     call NERDTreeAddKeyMap({
       \ 'key': g:NERDTreeMapActivateNode,
@@ -141,12 +259,41 @@ if g:webdevicons_enable == 1 && g:webdevicons_enable_nerdtree == 1
       \ 'override': 1,
       \ 'scope': 'DirNode' })
 
+    " NERDTreeMapOpenRecursively
+    call NERDTreeAddKeyMap({
+      \ 'key': g:NERDTreeMapOpenRecursively,
+      \ 'callback': 'WebDevIconsNERDTreeMapOpenRecursively',
+      \ 'override': 1,
+      \ 'scope': 'DirNode' })
+
+    " NERDTreeMapCloseChildren
+    call NERDTreeAddKeyMap({
+      \ 'key': g:NERDTreeMapCloseChildren,
+      \ 'callback': 'WebDevIconsNERDTreeMapCloseChildren',
+      \ 'override': 1,
+      \ 'scope': 'DirNode' })
+
+    " NERDTreeMapCloseChildren
+    call NERDTreeAddKeyMap({
+      \ 'key': g:NERDTreeMapCloseDir,
+      \ 'callback': 'WebDevIconsNERDTreeMapCloseDir',
+      \ 'override': 1,
+      \ 'scope': 'Node' })
+
     " <2-LeftMouse>
     call NERDTreeAddKeyMap({
       \ 'key': '<2-LeftMouse>',
       \ 'callback': 'WebDevIconsNERDTreeMapActivateNode',
       \ 'override': 1,
       \ 'scope': 'DirNode' })
+
+    " NERDTreeMapUpdirKeepOpen
+    call NERDTreeAddKeyMap({
+      \ 'key': g:NERDTreeMapUpdirKeepOpen,
+      \ 'callback': 'WebDevIconsNERDTreeMapUpdirKeepOpen',
+      \ 'override': 1,
+      \ 'scope': 'all' })
+
   endif
 
   " Temporary (hopefully) fix for glyph issues in gvim (proper fix is with the

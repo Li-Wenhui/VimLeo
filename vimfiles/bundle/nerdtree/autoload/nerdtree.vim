@@ -13,20 +13,43 @@ endfunction
 "FUNCTION: nerdtree#checkForBrowse(dir) {{{2
 "inits a window tree in the current buffer if appropriate
 function! nerdtree#checkForBrowse(dir)
-    if a:dir != '' && isdirectory(a:dir)
-        call g:NERDTreeCreator.CreateWindowTree(a:dir)
+    if !isdirectory(a:dir)
+        return
     endif
+
+    if s:reuseWin(a:dir)
+        return
+    endif
+
+    call g:NERDTreeCreator.CreateWindowTree(a:dir)
+endfunction
+
+"FUNCTION: s:reuseWin(dir) {{{2
+"finds a NERDTree buffer with root of dir, and opens it.
+function! s:reuseWin(dir) abort
+    let path = g:NERDTreePath.New(fnamemodify(a:dir, ":p"))
+
+    for i in range(1, bufnr("$"))
+        unlet! nt
+        let nt = getbufvar(i, "NERDTree")
+        if empty(nt)
+            continue
+        endif
+
+        if nt.isWinTree() && nt.root.path.equals(path)
+            call nt.setPreviousBuf(bufnr("#"))
+            exec "buffer " . i
+            return 1
+        endif
+    endfor
+
+    return 0
 endfunction
 
 " FUNCTION: nerdtree#completeBookmarks(A,L,P) {{{2
 " completion function for the bookmark commands
 function! nerdtree#completeBookmarks(A,L,P)
     return filter(g:NERDTreeBookmark.BookmarkNames(), 'v:val =~# "^' . a:A . '"')
-endfunction
-
-"FUNCTION: nerdtree#compareBookmarks(dir) {{{2
-function! nerdtree#compareBookmarks(first, second)
-    return a:first.compareTo(a:second)
 endfunction
 
 "FUNCTION: nerdtree#compareNodes(dir) {{{2
@@ -61,10 +84,12 @@ function! nerdtree#deprecated(func, ...)
 endfunction
 
 " FUNCTION: nerdtree#exec(cmd) {{{2
-" same as :exec cmd  but eventignore=all is set for the duration
+" Same as :exec cmd but with eventignore set for the duration
+" to disable the autocommands used by NERDTree (BufEnter,
+" BufLeave and VimEnter)
 function! nerdtree#exec(cmd)
     let old_ei = &ei
-    set ei=all
+    set ei=BufEnter,BufLeave,VimEnter
     exec a:cmd
     let &ei = old_ei
 endfunction

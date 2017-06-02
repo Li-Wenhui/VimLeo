@@ -353,6 +353,7 @@ g:neocomplete#auto_complete_delay
 		It is the auto completion delay time after your input.
 		The unit is ms.
 		Note: It requires |+timers| feature.
+		Note: It is disabled in MacVim.
 
 		Default value is 50.
 
@@ -846,7 +847,6 @@ EXAMPLES					*neocomplete-examples*
 	let g:neocomplete#enable_at_startup = 1
 	" Use smartcase.
 	let g:neocomplete#enable_smart_case = 1
-	let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 
 	" Define dictionary.
 	let g:neocomplete#sources#dictionary#dictionaries = {
@@ -874,7 +874,14 @@ EXAMPLES					*neocomplete-examples*
 	  "return pumvisible() ? "\<C-y>" : "\<CR>"
 	endfunction
 	" <TAB>: completion.
-	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+	inoremap <silent><expr> <TAB>
+	      \ pumvisible() ? "\<C-n>" :
+	      \ <SID>check_back_space() ? "\<TAB>" :
+	      \ neocomplete#start_manual_complete()
+	function! s:check_back_space() abort "{{{
+	  let col = col('.') - 1
+	  return !col || getline('.')[col - 1]  =~ '\s'
+	endfunction"}}}
 	" <C-h>, <BS>: close popup and delete backword char.
 	inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 	inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
@@ -1036,7 +1043,7 @@ Default sources are below. But you can create original filters (cf:
 	" Change default converter.
 	call neocomplete#custom#source('_', 'converters',
 	\ ['converter_remove_overlap', 'converter_remove_last_paren',
-        \  'converter_delimiter', 'converter_abbr'])
+        \  'converter_abbr'])
 <
 					*neocomplete-filter-matcher_default*
 Default matchers:
@@ -1051,8 +1058,7 @@ Default matchers:
 Default sorters: ['sorter_rank'].
 
 					*neocomplete-filter-converter_default*
-Default converters: ['converter_remove_overlap',
-        \      'converter_delimiter', 'converter_abbr'].
+Default converters: ['converter_remove_overlap', 'converter_abbr'].
 
 					*neocomplete-filter-matcher_head*
 matcher_head	Head matching matcher.
@@ -1596,8 +1602,8 @@ Q: I want to use Ruby omni completion.
 
 A: Please set |g:neocomplete#force_omni_input_patterns|.  But this completion
 is heavy, so disabled by default.
-Note: But you should use |neocomplete-rsense| instead of rubycomplete.
-https://github.com/Shougo/neocomplete-rsense
+Note: But you should use |vim-monster| instead of rubycomplete.
+https://github.com/osyo-manga/vim-monster
 >
 	autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
 	if !exists('g:neocomplete#force_omni_input_patterns')
@@ -1816,7 +1822,7 @@ https://github.com/Shougo/neocomplete.vim/issues/158
 A: >
 	call neocomplete#custom#source('tags', 'converters',
 	\ ['converter_remove_overlap', 'converter_remove_last_paren',
-	\  'converter_delimiter', 'converter_disable_abbr', 'converter_abbr'])
+	\  'converter_disable_abbr', 'converter_abbr'])
 
 Q: <C-x><C-u> does not work.
 https://github.com/Shougo/neocomplete.vim/issues/305

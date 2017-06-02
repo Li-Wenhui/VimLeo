@@ -22,12 +22,18 @@ function! SyntaxCheckers_typescript_tslint_GetHighlightRegex(item)
 endfunction
 
 function! SyntaxCheckers_typescript_tslint_GetLocList() dict
+    if !exists('s:tslint_new')
+        let s:tslint_new = syntastic#util#versionIsAtLeast(self.getVersion(), [2, 4])
+    endif
+
     let makeprg = self.makeprgBuild({
         \ 'args_after': '--format verbose',
-        \ 'fname_before': '-f' })
+        \ 'fname_before': (s:tslint_new ? '' : '-f') })
 
-    " (comment-format) ts/app.ts[12, 36]: comment must start with lowercase letter
-    let errorformat = '%f[%l\, %c]: %m'
+    let errorformat =
+        \ '%EERROR: %f[%l\, %c]: %m,' .
+        \ '%WWARNING: %f[%l\, %c]: %m,' .
+        \ '%E%f[%l\, %c]: %m'
 
     return SyntasticMake({
         \ 'makeprg': makeprg,

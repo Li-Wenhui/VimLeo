@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mhinz/vim-startify.svg?branch=master)](https://travis-ci.org/mhinz/vim-startify)
 
-![vim-startify](https://raw.githubusercontent.com/mhinz/vim-startify/master/pictures/startify-logo.png)
+![vim-startify](https://raw.githubusercontent.com/mhinz/vim-startify/master/images/startify-logo.png)
 
 ---
 
@@ -39,14 +39,20 @@ documentation for further customization:
 
 ## Screenshot
 
-![Startify in action!](https://github.com/mhinz/vim-startify/blob/master/pictures/startify-menu.png)
-That's it. A fancy start screen for Vim.  _(almost all visible features enabled - freely customizable)_
+![Startify in action!](https://github.com/mhinz/vim-startify/blob/master/images/startify-menu.png)
+
+That's it. A fancy start screen for Vim.
+
+_(Almost all visible features enabled. Colorscheme:
+[vim-janah](https://github.com/mhinz/vim-janah).)_
+
+## Gotchas
+
+The Vim 7.4.898 from macOS 10.12 (`/usr/bin/vim`) comes with a bug, that opens
+files with `readonly` set. Don't use this Vim from 3 years ago. Use homebrew or
+MacPorts to get a current version.
 
 ## Author and Feedback
 
 If you like my plugins, please star them on Github. It's a great way of getting
 feedback. Same goes for issues reports or feature requests.
-
-Contact: [Twitter](https://twitter.com/_mhinz_)
-
-_Get your Vim on!_

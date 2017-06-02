@@ -1,6 +1,9 @@
     For Vim version 8.0.  Last change: 2013 Jul 06
 
+
 		  VIM REFERENCE MANUAL    by Bram Moolenaar
+
+
 
 SUMMARY
 
@@ -209,6 +212,7 @@ Sending money:
 
 Check the ICCF web site for the latest information!  See |iccf| for the URL.
 
+
 USA:		The methods mentioned below can be used.
 		Sending a check to the Nehemiah Group Outreach Society (NGOS)
 		is no longer possible, unfortunately. We are looking for
@@ -281,4 +285,3 @@ Address to send checks to:
 
 This address is expected to be valid for a long time.
 
- ts=8:ft=help:norl:

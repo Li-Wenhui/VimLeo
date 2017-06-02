@@ -292,6 +292,14 @@ function! Tex_ViewLaTeX()
 		endif
 
 		if( Tex_GetVarValue('Tex_ExecuteUNIXViewerInForeground') != 1 )
+			" Redirect output to /dev/null
+			if( stridx( &shellredir, "%s" ) != -1 )
+				let execString .= " " . substitute( &shellredir, "%s", "/dev/null", '' )
+			else
+				let execString .= " " . &shellredir . "/dev/null"
+			endif
+
+			" And execute in background
 			let execString = execString.' &'
 		endif
 
@@ -347,11 +355,11 @@ function! Tex_ForwardSearchLaTeX()
 
 	let l:origdir = fnameescape(getcwd())
 
-	let mainfnameRoot = fnameescape(fnamemodify(Tex_GetMainFileName(), ':t:r'))
-	let mainfnameFull = fnameescape(Tex_GetMainFileName(':p:r'))
-	let target_file = mainfnameFull . "." . s:target
-	let sourcefile = fnameescape(expand('%'))
-	let sourcefileFull = fnameescape(expand('%:p'))
+	let mainfnameRoot = shellescape(fnamemodify(Tex_GetMainFileName(), ':t:r'), 1)
+	let mainfnameFull = Tex_GetMainFileName(':p:r')
+	let target_file = shellescape(mainfnameFull . "." . s:target, 1)
+	let sourcefile = shellescape(expand('%'), 1)
+	let sourcefileFull = shellescape(expand('%:p'), 1)
 	let linenr = line('.')
 	" cd to the location of the file to avoid problems with directory name
 	" containing spaces.
@@ -368,23 +376,27 @@ function! Tex_ForwardSearchLaTeX()
 		elseif (viewer =~? "^sumatrapdf")
 			" Forward search in sumatra has these arguments (-reuse-instance is optional):
 			" SumatraPDF -reuse-instance "pdfPath" -forward-search "texPath" lineNumber
-			let execString .= Tex_Stringformat('start %s "%s" -forward-search "%s" %s', viewer, target_file, mainfnameFull.".tex", linenr)
+			let execString .= Tex_Stringformat('start %s %s -forward-search %s %s', viewer, target_file, sourcefileFull, linenr)
 		endif	
 
-	elseif (has('macunix') && (viewer =~ '^ *\(Skim\|PDFView\|TeXniscope\)\( \|$\)'))
+	elseif (has('macunix') && (viewer =~ '\(Skim\|PDFView\|TeXniscope\)'))
 		" We're on a Mac using a traditional Mac viewer
 
-		if viewer =~ '^ *Skim'
+		if viewer =~ 'Skim'
 
+			if executable('displayline')
+				let execString .= 'displayline '
+			else
 				let execString .= '/Applications/Skim.app/Contents/SharedSupport/displayline '
+			endif
 				let execString .= join([linenr, target_file, sourcefileFull])
 
-		elseif viewer =~ '^ *PDFView'
+		elseif viewer =~ 'PDFView'
 
 				let execString .= '/Applications/PDFView.app/Contents/MacOS/gotoline.sh '
 				let execString .= join([linenr, target_file, sourcefileFull])
 
-		elseif viewer =~ '^ *TeXniscope'
+		elseif viewer =~ 'TeXniscope'
 
 				let execString .= '/Applications/TeXniscope.app/Contents/Resources/forward-search.sh '
 				let execString .= join([linenr, sourcefileFull, target_file])
@@ -395,14 +407,14 @@ function! Tex_ForwardSearchLaTeX()
 		" We're either UNIX or Mac and using a UNIX-type viewer
 
 		" Check for the special DVI viewers first
-		if viewer =~ '^ *\(xdvi\|xdvik\|kdvi\|okular\)\( \|$\)'
+		if viewer =~ '^ *\(xdvi\|xdvik\|kdvi\|okular\|zathura\)\( \|$\)'
 			let execString .= viewer." "
 
 			if Tex_GetVarValue('Tex_UseEditorSettingInDVIViewer') == 1 &&
 						\ exists('v:servername') &&
 						\ viewer =~ '^ *xdvik\?\( \|$\)'
 
-				let execString .= Tex_Stringformat('-name xdvi -sourceposition "%s %s" -editor "gvim --servername %s --remote-silent +\%l \%f" %s', linenr, sourcefile, v:servername, target_file)
+				let execString .= Tex_Stringformat('-name xdvi -sourceposition "%s %s" -editor "gvim --servername %s --remote-silent +\%l \%f" %s', linenr, expand('%'), v:servername, target_file)
 
 			elseif viewer =~ '^ *kdvi'
 
@@ -410,19 +422,28 @@ function! Tex_ForwardSearchLaTeX()
 
 			elseif viewer =~ '^ *xdvik\?\( \|$\)'
 
-				let execString .= Tex_Stringformat('-name xdvi -sourceposition "%s %s" %s', linenr, sourcefile, target_file)
+				let execString .= Tex_Stringformat('-name xdvi -sourceposition "%s %s" %s', linenr, expand('%'), target_file)
 
 			elseif viewer =~ '^ *okular'
 
 				let execString .= Tex_Stringformat('--unique %s\#src:%s%s', target_file, linenr, sourcefileFull)
 
+			elseif viewer =~ '^ *zathura'
+
+				let execString .= Tex_Stringformat('--synctex-forward %s:1:%s %s', linenr, sourcefileFull, target_file)
+
 			endif
 
+		elseif (viewer == "synctex_wrapper" )
+			" Unix + synctex_wrapper
+			" You can add a custom script named 'synctex_wrapper' in your $PATH
+			" syntax is: synctex_wrapper TARGET_FILE LINE_NUMBER COLUMN_NUMBER SOURCE_FILE
+			let execString .= Tex_Stringformat('synctex_wrapper %s %s %s %s', target_file, linenr, col('.'), sourcefile)
 		else
 			" We must be using a generic UNIX viewer
 			" syntax is: viewer TARGET_FILE LINE_NUMBER SOURCE_FILE
 
-			let execString .= join([target_file, linenr, sourcefile])
+			let execString .= join([viewer, target_file, linenr, sourcefile])
 
 		endif
 
@@ -489,7 +510,11 @@ function! Tex_PartCompile() range
 	exe a:firstline.','.a:lastline."w! >> ".tmpfile
 
 	" edit the temporary file
-	exec 'drop '.tmpfile
+	if exists('drop')
+		exec 'drop '.tmpfile
+	else
+		exec 'tabe '.tmpfile
+	endif
 
 	" append the \end{document} line.
 	$ put ='\end{document}'

@@ -129,6 +129,7 @@ function! neocomplete#handler#_do_auto_complete(event) abort "{{{
   endif
 
   if g:neocomplete#auto_complete_delay > 0 && has('timers')
+        \ && (!has('gui_macvim') || has('patch-8.0.95'))
     if exists('s:timer')
       call timer_stop(s:timer.id)
     endif
@@ -222,6 +223,7 @@ function! s:check_in_do_auto_complete(event) abort "{{{
   if (&l:foldmethod ==# 'expr' || &l:foldmethod ==# 'syntax')
         \ && !neocomplete.detected_foldmethod
         \ && a:event !=# 'InsertEnter'
+        \ && line('.') > 1000
     let neocomplete.detected_foldmethod = 1
     call neocomplete#print_error(
           \ printf('foldmethod = "%s" is detected.', &foldmethod))
@@ -346,11 +348,9 @@ endfunction"}}}
 function! s:is_delimiter() abort "{{{
   " Check delimiter pattern.
   let is_delimiter = 0
-  let filetype = neocomplete#get_context_filetype()
   let cur_text = neocomplete#get_cur_text(1)
 
-  for delimiter in ['/', '.'] +
-        \ get(g:neocomplete#delimiter_patterns, filetype, [])
+  for delimiter in ['/']
     if stridx(cur_text, delimiter,
           \ len(cur_text) - len(delimiter)) >= 0
       let is_delimiter = 1
