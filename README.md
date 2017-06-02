@@ -63,8 +63,7 @@ lwh@vip.163.com
 ........[8.1 快速编辑结对符 ](#8.1)
 ........[8.2 支持分支的 undo ](#8.2)
 ........[8.3 快速移动 ](#8.3)
-........[8.4 markdown 即时预览 ](#8.4)
-........[8.5 中 / 英输入平滑切换 ](#8.5)
+........[8.4 中 / 英输入平滑切换 ](#8.5)
 [9 尾声](#9)
 
 
@@ -2683,34 +2682,6 @@ easymotion 只做一件事：把满足条件的位置用 [;A~Za~z] 间的标签�
 <img src="./images/搭配操作命令的快速移动.gif" alt=""/>
 （搭配操作命令的快速移动）
 
-
-### 8.4 markdown 即时预览
-
-作为一枚热衷开源的伪 geek，github.com 与我同在。发布在 github.com 的任何项目你得有个项目简介，README.md，这是一种用 markdown 文书编写语法制作的说明文档。关于 markdown，我有两个需求，一是 vim 要高亮显示 markdown 语法，一是 firefox 要能渲染其语法、即时显示更新结果。
-
-第一个需求不是问题，新版 vim 已经集成了 markdown 语法高亮插件，无须单独配置。
-
-第二个需求，按照一般逻辑，应该通过 firefox 的某款插件来实现，的确，Markdown Viewer 看起来是干这个事儿的，但它响应速度缓慢、中文显示乱码、无法即时渲染等等问题让我无法接受。网上倒是有些即时渲染 markdown 的网站，比如，https://stackedit.io/editor ，左侧编辑右侧显示，所见即所得，但这又无法让我使用 vim，不行。还是回到 vim 身上想办法，vim-instant-markdown 来了。有了这款 vim 插件，一旦你启用 vim 编辑 markdown 文档，vim-instant-markdown 自动开启 firefox 为你显示 markdown 最终效果，如果你在 vim 中变更了文档内容，vim-instant-markdown 即时渲染、firefox 同步更新，太棒了！
-
-<img src="./images/markdown 即时渲染.gif" alt=""/>
-（markdown 即时渲染）
-
-
-vim-instant-markdown（https://github.com/suan/vim-instant-markdown ） 的安装相比其他插件较为特殊，它由 ruby 开发，所以你的 vim 必须集成 ruby 解释器（见“1 源码安装编辑器 vim ”），并且安装 pygments.rb、redcarpet、instant-markdown-d 三个依赖库：
-
-```
-gem install pygments.rb
-gem install redcarpet
-# 若系统提示无 npm 命令，你需要先执行 zypper --no-refresh install nodejs
-npm -g install instant-markdown-d
-```
-注意，以上三条命令均要翻墙。
-
-对于重内容、轻设计的我这类人来说，markdown 简洁的文书语法太贴心了。推荐三个网站：
-
-* markdown 语法 http://daringfireball.net/projects/markdown/syntax
-* github.com 扩展 https://guides.github.com/features/mastering-markdown/
-* emoji 符号表情 http://www.emoji-cheat-sheet.com/
 
 ### 8.5 中 / 英输入平滑切换
 
